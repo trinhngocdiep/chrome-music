@@ -1,0 +1,26 @@
+<div class="searchbox">
+
+  <mat-form-field class="searchbox__term">
+    <mat-label>What are you looking for?</mat-label>
+    <input #searchInput matInput [(ngModel)]="state.term" [matAutocomplete]="searchAutoComplete" (keydown.enter)="acceptSearchTerm()">
+    <mat-autocomplete #searchAutoComplete="matAutocomplete" (optionSelected)="acceptSearchTerm()">
+      <mat-option *ngFor="let e of suggestions | async" [value]="e.value">{{e.value}}</mat-option>
+    </mat-autocomplete>
+  </mat-form-field>
+  
+  <button mat-icon-button (click)="acceptSearchTerm()">
+    <mat-icon>search</mat-icon>
+  </button>
+
+  <button mat-icon-button [matMenuTriggerFor]="searchOptionMenu">
+    <mat-icon>more_vert</mat-icon>
+  </button>
+</div>
+
+<mat-menu #searchOptionMenu="matMenu">
+  <ng-template matMenuContent>
+    <div mat-menu-item *ngFor="let e of sources" (click)="toggleSource(e.value, $event)">
+      <mat-slide-toggle disableRipple [checked]="state[e.value]" (click)="$event.preventDefault()">{{e.label}}</mat-slide-toggle>
+    </div>
+  </ng-template>
+</mat-menu>

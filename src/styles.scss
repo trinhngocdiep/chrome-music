@@ -1,0 +1,36 @@
+@import './theme.scss';
+@import url('https://fonts.googleapis.com/css?family=Roboto');
+@import url('https://fonts.googleapis.com/icon?family=Material+Icons');
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  font: 500 14px/22px Roboto, "Helvetica Neue", sans-serif;
+  width: 600px;
+  height: 500px;
+  overflow: hidden;
+}
+
+button:focus {
+  outline: none;
+}
+
+::-webkit-scrollbar {
+  width: 5px;
+  background-color: #ccc;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: black;
+  border-radius: 3px;
+}
+
+cm-app {
+  background: white;
+  display: block;
+}

@@ -1,0 +1,71 @@
+.container {
+  padding: 0 8px 24px;
+  height: 450px;
+  overflow: auto;
+}
+
+.searchbox {
+  width: 100%;
+  height: 40px;
+  margin: 8px 0;
+}
+
+#nodata {
+  margin-top: 22px;
+  text-align: center;
+}
+
+.play-indicator {
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: 8px;
+}
+
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+th {
+  color: grey;
+  font-weight: normal;
+  font-size: .8em;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: white;
+  border-bottom: 1px solid lightgrey;
+}
+
+td {
+  padding: 4px 8px 4px 0;
+}
+
+tr {
+  cursor: pointer;
+  border-bottom: 1px solid rgba(0, 0, 0, .08);
+}
+
+tbody tr:hover {
+  background: rgba(0, 0, 0, .05);
+}
+
+tr.active {
+  background: rgba(0, 0, 0, .1);
+}
+
+.col-title {
+  padding-right: 16px;
+  padding-left: 4px;
+}
+
+.col-length {
+  max-width: 7em;
+}
+
+.col-action {
+  width: 80px;
+  padding: 0;
+  text-align: left;
+}

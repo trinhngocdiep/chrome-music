@@ -1,0 +1,119 @@
+.tracklist {
+  height: 100%;
+  position: relative;
+  overflow: auto;
+  padding-bottom: 16px;
+}
+
+.tracklist__list {
+  max-height: 100%;
+}
+
+.toolbar {
+  position: sticky;
+  z-index: 2;
+  top: 0;
+  right: 8px;
+  left: 0;
+  background: white;
+  padding: 8px;
+  display: flex;
+}
+
+.toolbar__searchbox {
+  flex: 1;
+}
+
+.toolbar__sort {
+  margin-left: 8px;
+  cursor: pointer;
+  transform: rotateX(180deg);
+}
+
+.toolbar__sort_desc {
+  transform: rotateX(0);
+}
+
+.searchbox {
+  position: relative;
+}
+
+.searchbox__icon {
+  position: absolute;
+  left: 4px;
+  top: 1px;
+  opacity: .5;
+}
+
+.searchbox__input {
+  width: 100%;
+  border: 1px solid lightgrey;
+  border-radius: 3px;
+  padding: 4px 8px;
+  padding-left: 30px;
+  outline: none;
+  color: grey;
+}
+
+.track {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  position: relative;
+  padding: 0 8px;
+  height: 40px;
+  overflow: hidden;
+}
+
+.track:hover {
+  background: #f3f3f3;
+}
+
+.track:hover .track__duration {
+  display: none;
+}
+
+.track__play-indicator {
+  margin-right: 8px;
+}
+
+.track__title {
+  padding-right: 8px;
+  flex-grow: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.track__duration {
+  max-width: 10em;
+  text-align: right;
+  font-size: 0.8em;
+}
+
+.track__menu {
+  display: none;
+}
+
+.track__menu:hover {
+  background: rgba(0, 0, 0, .1);
+}
+
+.track:hover .track__menu {
+  display: block;
+}
+
+.tracklist__placeholder {
+  margin: auto;
+  margin-top: 53%;
+  width: 15em;
+}
+
+.tracklist__placeholder button {
+  width: 100%;
+  text-align: left;
+}
+
+.tracklist__placeholder button mat-icon {
+  margin-right: 4px;
+}

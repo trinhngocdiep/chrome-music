@@ -1,0 +1,28 @@
+.noise {
+  width: 120px;
+  height: 100px;
+  cursor: pointer;
+  opacity: 0.3;
+  margin: 8px;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  transition: opacity 0.3s ease;
+}
+
+.noise_selected {
+  opacity: 1;
+}
+
+.noise__icon {
+  width: 50%;
+}
+
+.noise__volume {
+  min-width: 100%;
+  display: none;
+}
+
+.noise_selected .noise__volume {
+  display: block;
+}

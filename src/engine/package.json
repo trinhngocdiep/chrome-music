@@ -1,0 +1,22 @@
+{
+  "name": "chrome-music-engine",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "watch": "webpack --watch",
+    "start": "webpack-dev-server",
+    "build": "webpack"
+  },
+  "devDependencies": {
+    "ts-loader": "^4.5.0",
+    "typescript": "^3.0.1",
+    "webpack": "^4.17.1",
+    "webpack-cli": "^3.1.0",
+    "webpack-dev-server": "^3.1.6"
+  },
+  "dependencies": {
+    "@types/hls.js": "^0.10.1",
+    "hls.js": "^0.11.0",
+    "rxjs": "^6.2.2"
+  }
+}

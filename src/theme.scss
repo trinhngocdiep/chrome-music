@@ -1,0 +1,65 @@
+@import '~@angular/material/theming';
+
+@include mat-core();
+
+$primary: mat-palette($mat-green, 900);
+$accent: mat-palette($mat-green, 200);
+$warn: mat-palette($mat-red);
+
+$theme: mat-light-theme($primary, $accent, $warn);
+
+@include angular-material-theme($theme);
+
+.mat-cell,
+.mat-header-cell {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-right: 24px;
+}
+
+.mat-dialog-actions,
+.mat-card-actions {
+  display: flex !important;
+  justify-content: flex-end;
+}
+
+.mat-row.checked {
+  background: #F5F5F5;
+}
+
+.mat-row.highlight {
+  background: #EEEEEE;
+}
+
+.mat-cell .mat-slide-toggle {
+  padding-top: 8px;
+}
+
+.mat-form-field-flex {
+  align-items: flex-end !important;
+}
+
+.mat-tab-label {
+  min-width: 150px !important;
+}
+
+.mat-button-toggle {
+  color: inherit;
+}
+
+.mat-button-toggle+.mat-button-toggle {
+  margin-left: 8px;
+}
+
+.mat-button-toggle-checked {
+  color: mat-color($primary, 1);
+}
+
+.mat-menu-item {
+  display: flex;
+  align-items: center;
+}
+
+.mat-form-field-suffix .mat-icon-button {
+  font-size: 1.5em !important;
+}

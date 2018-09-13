@@ -1,0 +1,4 @@
+<span class="noise" [class.noise_selected]="selected" [title]="data.title" (click)="toggleSelection()">
+  <img class="noise__icon" [src]="data.icon">
+  <mat-slider class="noise__volume" min="0" max="100" [value]="volume" (click)="$event.stopPropagation()" (change)="setVolume($event.value);"></mat-slider>
+</span>

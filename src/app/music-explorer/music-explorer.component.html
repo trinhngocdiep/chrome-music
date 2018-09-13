@@ -1,0 +1,51 @@
+<div class="music-explorer" #container>
+
+  <cm-explorer-searchbox class="music-explorer__searchbox"></cm-explorer-searchbox>
+
+  <div class="title">{{title}}</div>
+
+  <ng-container *ngIf="topLoaderVisible" [ngTemplateOutlet]="loadingTemplate"></ng-container>
+
+  <ng-container *ngIf="content?.tracks?.length > 0; else contentEmptyTemplate">
+    <div class="track" *ngFor="let e of content?.tracks" (click)="play(e)">
+      <div class="track__thumb artwork">
+        <img class="artwork__img" [src]="e.artworkUrl" *ngIf="e.artworkUrl">
+        <div class="artwork__alt" *ngIf="!e.artworkUrl">{{e.sourceName || e.source}}</div>
+        <div class="artwork__subtitle">{{e.durationInSeconds | duration}}</div>
+        <mat-icon class="artwork__overlay">play_arrow</mat-icon>
+      </div>
+      <div class="track__body">
+        <div class="track__title" [title]="e.title">{{e.title}}</div>
+        <span class="track__origin" (click)="$event.stopPropagation(); open(e)" title="Go to source">{{e.sourceName || e.source}}</span>
+        <div>
+          <button class="track__action" mat-icon-button (click)="$event.stopPropagation(); queue(e)" title="Add to Now Playing">
+            <mat-icon>playlist_add</mat-icon>
+          </button>
+          <button class="track__action" mat-icon-button (click)="$event.stopPropagation(); addToLib(e)" title="Add to My Music">
+            <mat-icon>library_music</mat-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+  <ng-container *ngIf="botLoaderVisible" [ngTemplateOutlet]="loadingTemplate"></ng-container>
+  <div id="overscroll">
+    <div id="end" *ngIf="hasNoMoreData">No more data.
+      <button mat-stroked-button (click)="scrollToTop()">Back to top</button>
+    </div>
+  </div>
+</div>
+
+<ng-template #loadingTemplate>
+  <div class="track track_loading" *ngFor="let i of [1,2,3]">
+    <div class="track__thumb"></div>
+    <div class="track__body"></div>
+  </div>
+</ng-template>
+
+<ng-template #contentEmptyTemplate>
+  <div id="nodata" *ngIf="!topLoaderVisible && !botLoaderVisible">
+    <p>No content. Make sure you have at least one source enabled.</p>
+  </div>
+</ng-template>

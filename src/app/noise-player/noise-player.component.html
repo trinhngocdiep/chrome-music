@@ -1,0 +1,10 @@
+<div class="container" *ngIf="init">
+  <div class="container__controls">
+    <span class="container__controls-hint">Select to mix the noises</span>
+    <mat-icon class="container__controls-mute" (click)="toggleMuted()" *ngIf="!muted">volume_up</mat-icon>
+    <mat-icon class="container__controls-mute" (click)="toggleMuted()" *ngIf="muted">volume_off</mat-icon>
+  </div>
+  <div class="container__noises">
+    <cm-noise *ngFor="let e of noises" [data]="e" (select)="noiseSelected()"></cm-noise>
+  </div>
+</div>

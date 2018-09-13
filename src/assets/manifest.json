@@ -1,0 +1,25 @@
+{
+  "manifest_version": 2,
+  "name": "HD Music",
+  "description": "HD Music",
+  "version": "1.0",
+  "browser_action": {
+    "default_popup": "index.html"
+  },
+  "permissions": [
+    "*://*/",
+    "storage",
+    "identity",
+    "identity.email",
+    "contextMenus",
+    "downloads"
+  ],
+  "icons": {
+    "128": "assets/images/music-128.png"
+  },
+  "background": {
+    "persistent": true,
+    "scripts": ["assets/engine.js"]
+  },
+  "content_security_policy": "script-src 'self' https://suggestqueries.google.com/ 'unsafe-eval'; object-src 'self'"
+}

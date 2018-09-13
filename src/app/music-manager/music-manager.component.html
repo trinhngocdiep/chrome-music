@@ -1,0 +1,70 @@
+<div class="container">
+
+  <mat-form-field class="searchbox">
+    <mat-icon matPrefix>search</mat-icon>
+    <mat-label>Title</mat-label>
+    <input type="search" #filterInput matInput [(ngModel)]="filter">
+  </mat-form-field>
+
+  <table matSort matSortDisableClear>
+    <thead>
+      <tr>
+        <th class="col-title" mat-sort-header="title">Title</th>
+        <th class="col-length" mat-sort-header="durationInSeconds">Length</th>
+        <th class="col-action">
+          <button mat-icon-button [matMenuTriggerFor]="listMenu">
+            <mat-icon>more_horiz</mat-icon>
+          </button>
+        </th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr *ngFor="let row of filteredTracks" [id]="row.id" (click)="play(row)">
+        <td class="col-title">
+          <cm-soundbar class="play-indicator" *ngIf="isPlaying(row)"></cm-soundbar>
+          <span>{{row.title}}</span>
+        </td>
+        <td class="col-length">{{row.durationInSeconds | duration}}</td>
+        <td class="col-action">
+          <button mat-icon-button (click)="$event.stopPropagation(); queue(row)" title="Queue">
+            <mat-icon>playlist_add</mat-icon>
+          </button>
+          <button mat-icon-button (click)="$event.stopPropagation()" [matMenuTriggerFor]="trackMenu" [matMenuTriggerData]="{$implicit: row}">
+            <mat-icon>more_vert</mat-icon>
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div id="nodata" *ngIf="isEmpty">
+    <span>No tracks found.</span>
+    <button mat-button color="primary" (click)="navigation.openExplorer()">
+      <mat-icon>search</mat-icon>
+      Explore more
+    </button>
+  </div>
+</div>
+
+<mat-menu #listMenu="matMenu">
+  <ng-template matMenuContent>
+    <button mat-menu-item (click)="play()">
+      <mat-icon>playlist_play</mat-icon>
+      <span>Play all</span>
+    </button>
+    <button mat-menu-item (click)="queue()">
+      <mat-icon>playlist_add</mat-icon>
+      <span>Queue all</span>
+    </button>
+  </ng-template>
+</mat-menu>
+
+<mat-menu #trackMenu="matMenu">
+  <ng-template matMenuContent let-track>
+    <button mat-menu-item (click)="queue(track)">Queue</button>
+    <button mat-menu-item (click)="download.download(track)">Download</button>
+    <button mat-menu-item (click)="navigation.openSource(track)">Open source</button>
+    <button mat-menu-item (click)="remove(track)">Remove from My Library</button>
+  </ng-template>
+</mat-menu>

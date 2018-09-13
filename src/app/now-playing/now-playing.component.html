@@ -1,0 +1,55 @@
+<div class="now-playing">
+
+  <div class="player now-playing__player">
+    <div class="player__empty">
+      <mat-icon class="player__empty-artwork material-icons" *ngIf="!player.currentTrack">music_note</mat-icon>
+    </div>
+
+    <ng-container *ngIf="player.currentTrack">
+      <div class="player__title">{{player.currentTrack.title}}</div>
+      <div class="player__other-actions">
+        <span class="player__other-actions-item" title="Download" (click)="download.download(player.currentTrack)">
+          <mat-icon>file_download</mat-icon>
+        </span>
+        <span class="player__other-actions-item" [title]="'Open in ' + (player.currentTrack.source == 'sc' ? 'SoundCloud' : 'YouTube')"
+          (click)="navigation.openSource(player.currentTrack)">
+          <mat-icon>open_in_new</mat-icon>
+        </span>
+        <span class="player__other-actions-item" title="Configure background noises" (click)="navigation.openNoises()">
+          <mat-icon>surround_sound</mat-icon>
+        </span>
+      </div>
+      <div class="player__artwork">
+        <img class="player__artwork-img" [src]="player.currentTrack.artworkUrl" *ngIf="player.currentTrack.artworkUrl">
+        <mat-icon class="player__empty-artwork" *ngIf="!player.currentTrack.artworkUrl">music_note</mat-icon>
+        <div class="player__progress-text" *ngIf="progressBar">{{progressBar.value | duration}} / {{progressBar.max | duration}}</div>
+      </div>
+      <mat-slider class="player__progress-bar" #progressBar min="-1" value="-1" max="0" (change)="seek($event.value)"></mat-slider>
+      <div class="player__track-controls">
+        <button mat-icon-button (click)="player.previous()">
+          <mat-icon class="player__control-icon">skip_previous</mat-icon>
+        </button>
+        <button mat-icon-button *ngIf="!player.playing" (click)="play()">
+          <mat-icon class="player__control-icon">play_arrow</mat-icon>
+        </button>
+        <button mat-icon-button *ngIf="player.playing" (click)="pause()">
+          <mat-icon class="player__control-icon">pause</mat-icon>
+        </button>
+        <button mat-icon-button (click)="player.next()">
+          <mat-icon class="player__control-icon">skip_next</mat-icon>
+        </button>
+      </div>
+      <div class="player__overall-controls">
+        <mat-button-toggle [checked]="player.repeatEnabled" (change)="player.repeatEnabled = $event.source.checked">
+          <mat-icon>repeat_one</mat-icon>Repeat
+        </mat-button-toggle>
+        <mat-button-toggle [checked]="player.shuffleEnabled" (change)="player.shuffleEnabled = $event.source.checked">
+          <mat-icon>shuffle</mat-icon>Shuffle
+        </mat-button-toggle>
+      </div>
+    </ng-container>
+  </div>
+
+  <cm-playlist class="now-playing__playlist"></cm-playlist>
+
+</div>

@@ -1,0 +1,10 @@
+.searchbox {
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.searchbox__term {
+  flex: 1;
+  margin-right: 4px;
+}
