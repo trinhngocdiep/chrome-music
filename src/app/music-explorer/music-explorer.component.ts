@@ -27,7 +27,7 @@ export class MusicExplorerComponent {
   @ViewChild('container') container: ElementRef;
   @ViewChild(SearchboxComponent) searchBox: SearchboxComponent;
 
-  get title() { return this.query && this.query.term ? 'Search result' : 'Trending' };
+  title: string;
   topLoaderVisible: boolean;
   botLoaderVisible: boolean;
   hasNoMoreData: boolean;
@@ -82,9 +82,16 @@ export class MusicExplorerComponent {
         first(e => e == View.explorer),
         concatMap(() => fetch$)
       ).subscribe(result => {
+        this.title = this.query && this.query.term ? 'Search result' : 'Trending';
         this.content.tracks = this.content.tracks.concat(result.tracks);
         this.query.offset = result.offset;
         this.hasNoMoreData = this.content.tracks.length > 0 && result.end;
+      });
+
+    this.eventBus.exploreMoreTrack$
+      .pipe(filter(e => !!e))
+      .subscribe(e => {
+        console.log('explore more track', e);
       });
   }
 

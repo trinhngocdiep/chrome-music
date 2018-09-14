@@ -31,7 +31,27 @@ export class MusicExplorerService {
         })
       );
   }
+  // first, populate the list with the selected item and then play it.
+  // this.player.playlist = [track];
+  // this.play(track);
 
+  // // populate the list with related items when they become available.
+  // this.apiService.getRelatedTracks(track)
+  //   .subscribe(data => {
+  //     if (data.tracks.length > 0) {
+  //       this.player.playlist = this.player.playlist.concat(data.tracks);
+  //       this.play(track);
+  //     }
+  //   });
+
+  //   if (!track.videoId) {
+  //     console.log('Cannot find related video for non-youtube track', track);
+  //     return of({ tracks: [], pageToken: null });
+  // }
+  // let findRelatedQuery = 'https://www.googleapis.com/youtube/v3/search?key=' + YT_KEY + '&maxResults=50&type=video&part=snippet&relatedToVideoId=' + track.videoId;
+  // return this._searchYt(findRelatedQuery, null);
+
+  //https://api.soundcloud.com/tracks/191477804/related?client_id=458dac111e2456c40805cd838f4548c1
   private searchYt(query: SearchQuery): Observable<YtSearchResult> {
     if (
       // YT disabled

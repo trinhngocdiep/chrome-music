@@ -7,8 +7,9 @@ export class Track {
   artworkUrl: string;
 
 
-  // generated id
+  // UI stuff
   id?: string;
+  error?: string;
 
   // deprecated data
   artwork_url?: string;

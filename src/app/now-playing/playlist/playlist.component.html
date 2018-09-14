@@ -1,18 +1,21 @@
 <div class="tracklist">
 
+  <ng-container *ngIf="!hasPlaylist" [ngTemplateOutlet]="noPlaylistTemplate"></ng-container>
+
   <div [hidden]="!hasPlaylist">
     <div class="toolbar" matSort>
       <div class="toolbar__searchbox searchbox">
         <mat-icon class="searchbox__icon">search</mat-icon>
-        <input class="searchbox__input" type="search" #searchInput [(ngModel)]="filter">
+        <input class="searchbox__input" type="search" placeholder="Filter" #searchInput [(ngModel)]="filter">
       </div>
-      <mat-icon class="toolbar__sort" [class.toolbar__sort_desc]="(sort$ | async) == 'desc'" (click)="sort()">sort</mat-icon>
+      <mat-icon class="toolbar__sort" [ngClass]="{'toolbar__sort_desc': sortDirection == 'desc', 'toolbar__sort_asc': sortDirection == 'asc'}"
+        (click)="sort()">sort</mat-icon>
     </div>
 
-    <div class="tracklist__list">
-      <div class="track" *ngFor="let e of filteredList" [class.track_active]="e == player.currentTrack" (click)="play(e)">
+    <div class="tracklist__list" *ngIf="visibleTracks?.length > 0; else filterNoResultTemplate">
+      <div class="track" *ngFor="let e of visibleTracks" [class.track_error]="e.error" (click)="play(e)">
         <cm-soundbar class="track__play-indicator" *ngIf="e == player.currentTrack"></cm-soundbar>
-        <div class="track__title" [title]="e.title">{{e.title}}</div>
+        <div class="track__title" [title]="e.error || e.title">{{e.title}}</div>
         <div class="track__duration">{{e.durationInSeconds | duration}}</div>
         <button class="track__menu" (click)="$event.stopPropagation()" mat-icon-button [matMenuTriggerFor]="trackMenu" [matMenuTriggerData]="{$implicit: e}">
           <mat-icon>more_vert</mat-icon>
@@ -21,7 +24,25 @@
     </div>
   </div>
 
-  <div class="tracklist__placeholder" [hidden]="hasPlaylist">
+</div>
+
+<mat-menu #trackMenu="matMenu">
+  <ng-template matMenuContent let-data>
+    <button mat-menu-item (click)="remove(data)">Remove from queue</button>
+    <button mat-menu-item (click)="download.download(data)">Download</button>
+    <button mat-menu-item (click)="navigation.openSource(data)">Open source</button>
+    <button mat-menu-item (click)="addToLib(data)">Add to My Music</button>
+    <button mat-menu-item (click)="findInLib(data)">Reveal in My Music</button>
+    <button mat-menu-item (click)="findInExplorer(data)">Explore more tracks like this</button>
+  </ng-template>
+</mat-menu>
+
+<ng-template #filterNoResultTemplate>
+  <div id="nodata">No tracks found for the given filter.</div>
+</ng-template>
+
+<ng-template #noPlaylistTemplate>
+  <div class="tracklist__placeholder">
     <div>
       <button mat-button color="primary" (click)="playAll()">
         <mat-icon>video_library</mat-icon>
@@ -43,20 +64,8 @@
     <div>
       <button mat-button color="primary" (click)="navigation.openExplorer()">
         <mat-icon>search</mat-icon>
-        <span>Find a new song</span>
+        <span>Explore new music</span>
       </button>
     </div>
   </div>
-
-</div>
-
-<mat-menu #trackMenu="matMenu" class="mat-elevation-z6">
-  <ng-template matMenuContent let-data>
-    <button mat-menu-item (click)="remove(data)">Remove from queue</button>
-    <button mat-menu-item (click)="download.download(data)">Download</button>
-    <button mat-menu-item (click)="navigation.openSource(data)">Open source</button>
-    <button mat-menu-item (click)="addToLib(data)">Add to My Music</button>
-    <button mat-menu-item (click)="findInLib(data)">Reveal in My Music</button>
-    <!-- <button mat-menu-item (click)="findRelatedTracks(data)">Find related tracks</button> -->
-  </ng-template>
-</mat-menu>
+</ng-template>

@@ -12,6 +12,10 @@ export class ScPlayer implements Player {
         listener.onEnd(this);
       }
     };
+    this.audio.onerror = (e) => {
+      console.log('audio error', e);
+      listener.onError(this, e.error);
+    };
   }
 
   private audio: HTMLAudioElement = new Audio();

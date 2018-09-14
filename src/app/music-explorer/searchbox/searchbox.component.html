@@ -4,10 +4,13 @@
     <mat-label>What are you looking for?</mat-label>
     <input #searchInput matInput [(ngModel)]="state.term" [matAutocomplete]="searchAutoComplete" (keydown.enter)="acceptSearchTerm()">
     <mat-autocomplete #searchAutoComplete="matAutocomplete" (optionSelected)="acceptSearchTerm()">
-      <mat-option *ngFor="let e of suggestions | async" [value]="e.value">{{e.value}}</mat-option>
+      <mat-option *ngFor="let e of suggestions | async" [value]="e.value">
+        <mat-icon *ngIf="e.isHistory">history</mat-icon>
+        <span>{{e.value}}</span>
+      </mat-option>
     </mat-autocomplete>
   </mat-form-field>
-  
+
   <button mat-icon-button (click)="acceptSearchTerm()">
     <mat-icon>search</mat-icon>
   </button>

@@ -3,6 +3,8 @@ import { Player, PlayerListener } from './music-players/player';
 import { ScPlayer } from './music-players/sc-player';
 import { YtPlayer } from './music-players/yt-player';
 
+const delayAfterError = 5000;
+
 export class MusicPlayer {
 
   constructor() {
@@ -59,10 +61,12 @@ export class MusicPlayer {
       }
     },
     onError: (player: Player, error: string) => {
+      console.log(`Error playing track ${JSON.stringify(this.currentTrack)}`, error);
       this.playing = false;
+      this.currentTrack.error = `[PLAY_ERROR] ${error || 'Track not playable'}`;
       this.onError && this.onError(error);
       this.onStatusChange && this.onStatusChange();
-      this.next();
+      setTimeout(() => this.next(), delayAfterError);
     },
     onProgress: (player: Player, time: number) => {
       this.onProgress && this.onProgress(this.currentTrack, time);
@@ -70,6 +74,12 @@ export class MusicPlayer {
   };
 
   play(track: Track, force: boolean = false) {
+    if (track.error) {
+      console.log('Will not play errornous track', track);
+      setTimeout(() => this.next(), delayAfterError);
+      return;
+    }
+
     if (!force && track == this.currentTrack) {
       // resume the currently paused track
       if (!this.playing) {
@@ -77,11 +87,13 @@ export class MusicPlayer {
       }
       return;
     }
+
     const player = this.players.find(e => e.canPlay(track));
     if (!player) {
       this.onError && this.onError(`Track not playable ${track.title}`);
       return;
     }
+
     this.players.filter(e => e != player).forEach(e => e.pause());
     player.play(track);
     this._currentTrack = track;

@@ -1,16 +1,15 @@
 import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
-import { fromEvent, BehaviorSubject, merge, Subject } from 'rxjs';
+import { SortDirection } from '@angular/material';
+import { fromEvent, merge, Subject } from 'rxjs';
 import { distinctUntilChanged, debounceTime, map, startWith, filter } from 'rxjs/operators';
 
-import { EventBus, Runtime, Navigation, View, DownloadService } from 'src/app/core';
 import { Track, MusicPlayer } from 'src/engine';
-import { PlaylistService } from './playlist.service';
+import { EventBus, Runtime, Navigation, View, DownloadService, Searcher } from 'src/app/core';
 
 @Component({
   selector: 'cm-playlist',
   templateUrl: './playlist.component.html',
   styleUrls: ['./playlist.component.css'],
-  providers: [PlaylistService]
 })
 export class PlaylistComponent implements OnInit {
 
@@ -18,48 +17,44 @@ export class PlaylistComponent implements OnInit {
     private elementRef: ElementRef,
     private runtime: Runtime,
     private eventBus: EventBus,
-    private playlistService: PlaylistService,
     public navigation: Navigation,
     public download: DownloadService,
   ) { }
 
   player: MusicPlayer;
-  sort$ = new BehaviorSubject<string>('asc');
-  filteredList: Track[];
-  hasPlaylist: boolean;
   filter: string;
+  sortDirection: SortDirection;
+  visibleTracks: Track[];
+  hasPlaylist: boolean;
 
   private playlist$ = new Subject<Track[]>();
+  private sort$ = new Subject<void>();
+  private index = new Searcher();
 
   @ViewChild('searchInput') searchInput: ElementRef;
 
   ngOnInit() {
-    this.playlist$.subscribe(e => {
-      this.playlistService.updatePlaylist(e);
-      this.filteredList = e;
-      this.hasPlaylist = e && e.length > 0;
+    this.player = this.runtime.engine.musicPlayer;    
+    this.player.onPlaylistChange = tracks => this.playlist$.next(tracks);
+    this.player.onPlaylistChange(this.player.playlist); // initialize the playlist
+
+    this.playlist$.subscribe(tracks => {
+      this.index.updateIndex(tracks);
+      this.hasPlaylist = tracks && tracks.length > 0;
     });
-
-    const player = this.player = this.runtime.engine.musicPlayer;
-    this.playlist$.next(player.playlist);
-    player.onPlay = () => this.scrollToActiveTrack();
-    player.onPlaylistChange = e => {
-      this.playlist$.next(e);
-    };
-
+    
     const filter$ = fromEvent<any>(this.searchInput.nativeElement, 'input')
       .pipe(
         map(e => e.target.value),
         distinctUntilChanged()
       );
 
-    merge(this.sort$, filter$)
+    merge(this.playlist$, filter$, this.sort$)
       .pipe(
+        startWith(null),
         debounceTime(200),
-        startWith(null)
-      ).subscribe(() => {
-        this.filteredList = this.playlistService.getPlaylist(this.filter, this.sort$.value);
-      });
+        map(() => this.index.search(this.filter, { active: 'title', direction: this.sortDirection }))
+      ).subscribe(e => this.visibleTracks = e);
 
     this.navigation.navigate$.pipe(filter(e => e == View.nowPlaying)).subscribe(() => this.scrollToActiveTrack());
   }
@@ -69,13 +64,12 @@ export class PlaylistComponent implements OnInit {
   }
 
   sort() {
-    let sortType = this.sort$.value;
-    if (sortType == 'asc') {
-      sortType = 'desc';
+    if (this.sortDirection == 'asc') {
+      this.sortDirection = 'desc';
     } else {
-      sortType = 'asc';
+      this.sortDirection = 'asc';
     }
-    this.sort$.next(sortType);
+    this.sort$.next();
   }
 
   play(track: Track) {
@@ -86,12 +80,16 @@ export class PlaylistComponent implements OnInit {
     this.player.deque(track);
   }
 
+  addToLib(track: Track) {
+    this.eventBus.addToLib(track);
+  }
+
   findInLib(track: Track) {
     this.eventBus.showLib(track);
   }
 
-  addToLib(track: Track) {
-    this.eventBus.addToLib(track);
+  findInExplorer(track: Track) {
+    this.eventBus.exploreMoreTrack(track);
   }
 
   playAll() {
@@ -99,30 +97,15 @@ export class PlaylistComponent implements OnInit {
       this.navigation.openExplorer();
     }
   }
-
+  
   private scrollToActiveTrack() {
     setTimeout(() => {
-      const el: HTMLElement = this.elementRef.nativeElement.querySelector('.track_active');
+      const el: HTMLElement = this.elementRef.nativeElement.querySelector('.track .track__play-indicator');
       if (el && !isScrolledIntoView(el)) {
         el.scrollIntoView({ behavior: 'instant', block: 'nearest', inline: 'nearest' });
       }
     });
   }
-
-  // findRelatedTracks() {
-  // // first, populate the list with the selected item and then play it.
-  // this.player.playlist = [track];
-  // this.play(track);
-
-  // // populate the list with related items when they become available.
-  // this.apiService.getRelatedTracks(track)
-  //   .subscribe(data => {
-  //     if (data.tracks.length > 0) {
-  //       this.player.playlist = this.player.playlist.concat(data.tracks);
-  //       this.play(track);
-  //     }
-  //   });
-  // }
 }
 
 function isScrolledIntoView(el) {

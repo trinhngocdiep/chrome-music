@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { map, catchError } from 'rxjs/operators';
 
 import { Runtime } from 'src/app/core';
 import { SearchQuery } from '../music-explorer.model';
@@ -14,9 +14,10 @@ export class SearchboxService {
     private httpClient: HttpClient,
     private runtime: Runtime
   ) {
-    const engine = this.runtime.engine;
-    const parentState = engine.state.explorer = engine.state.explorer || {};
-    this.state = parentState.searchBox = parentState.searchBox || new SearchboxState();
+    // const engine = this.runtime.engine;
+    // const parentState = engine.state.explorer = engine.state.explorer || {};
+    // this.state = parentState.searchBox = parentState.searchBox || new SearchboxState();
+    this.state = new SearchboxState();
     const storage = this.getStorage();
     if (storage && storage.recentSearches) {
       this.state.recentSearches = storage.recentSearches;
@@ -26,15 +27,17 @@ export class SearchboxService {
   state: SearchboxState;
 
   getSuggestions(term: string): Observable<Suggestion[]> {
-    console.log('getSuggestions', term);
     term = term && term.trim();
     if (!term) {
       return of(this.state.recentSearches.map(e => ({ value: e, isHistory: true })));
     }
     return this.httpClient.get<any>(`${apiUrl}${term}`)
       .pipe(
-        map(data => data[1] as string[]),
-        map(terms => terms.map(e => ({ value: e })))
+        map(data => data[1].map(e => ({ value: e }))),
+        catchError(e => {
+          console.log('Error getting search suggestions', e);
+          return of([]);
+        })
       );
   }
 

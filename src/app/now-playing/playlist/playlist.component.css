@@ -28,9 +28,15 @@
   margin-left: 8px;
   cursor: pointer;
   transform: rotateX(180deg);
+  opacity: .5;
+}
+
+.toolbar__sort_asc {
+  opacity: 1;
 }
 
 .toolbar__sort_desc {
+  opacity: 1;
   transform: rotateX(0);
 }
 
@@ -103,6 +109,11 @@
   display: block;
 }
 
+.track_error .track__title {
+  text-decoration: line-through;
+  color: lightgrey;
+}
+
 .tracklist__placeholder {
   margin: auto;
   margin-top: 53%;
@@ -116,4 +127,9 @@
 
 .tracklist__placeholder button mat-icon {
   margin-right: 4px;
+}
+
+#nodata {
+  padding: 16px 8px;
+  color: grey;
 }

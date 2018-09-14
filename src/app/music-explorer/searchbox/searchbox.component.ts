@@ -1,10 +1,10 @@
 import { Component, OnInit, ViewChild, Output, EventEmitter, ElementRef } from '@angular/core';
+import { MatAutocompleteTrigger } from '@angular/material';
 import { fromEvent, Observable } from 'rxjs';
-import { debounceTime, map, distinctUntilChanged, switchMap } from 'rxjs/operators';
+import { debounceTime, map, distinctUntilChanged, switchMap, startWith } from 'rxjs/operators';
 
 import { SearchQuery } from '../music-explorer.model';
 import { SearchboxService, SearchboxState, Suggestion } from './searchbox.service';
-import { MatAutocompleteTrigger } from '@angular/material';
 
 @Component({
   selector: 'cm-explorer-searchbox',
@@ -34,6 +34,7 @@ export class SearchboxComponent implements OnInit {
         debounceTime(400),
         map(e => e.target.value),
         distinctUntilChanged(),
+        startWith(''),
         switchMap(e => this.searchboxService.getSuggestions(e))
       );
   }
