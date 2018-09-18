@@ -29,11 +29,11 @@
 <mat-menu #trackMenu="matMenu">
   <ng-template matMenuContent let-data>
     <button mat-menu-item (click)="remove(data)">Remove from queue</button>
+    <button mat-menu-item (click)="eventBus.exploreRelated(data)">Explore more tracks like this</button>
+    <button mat-menu-item (click)="addToLib(data)">Add to My Music</button>
+    <button mat-menu-item (click)="eventBus.showInLib(data)">Reveal in My Music</button>
     <button mat-menu-item (click)="download.download(data)">Download</button>
     <button mat-menu-item (click)="navigation.openSource(data)">Open source</button>
-    <button mat-menu-item (click)="addToLib(data)">Add to My Music</button>
-    <button mat-menu-item (click)="findInLib(data)">Reveal in My Music</button>
-    <button mat-menu-item (click)="findInExplorer(data)">Explore more tracks like this</button>
   </ng-template>
 </mat-menu>
 

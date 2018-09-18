@@ -20,15 +20,15 @@ export class EventBus {
     this._addToLib.next(track);
   }
 
-  private _showLib = new Subject<Track>();
-  showLib$ = this._showLib.asObservable();
-  showLib(track?: Track) {
-    this._showLib.next(track);
+  private _showInLib = new Subject<Track>();
+  showInLib$ = this._showInLib.asObservable();
+  showInLib(track?: Track) {
+    this._showInLib.next(track);
   }
 
-  private _exploreMoreTrack = new Subject<Track>();
-  exploreMoreTrack$ = this._exploreMoreTrack.asObservable();
-  exploreMoreTrack(track: Track) {
-    this._exploreMoreTrack.next(track);
+  private _exploreRelated = new Subject<Track>();
+  exploreRelated$ = this._exploreRelated.asObservable();
+  exploreRelated(track?: Track) {
+    this._exploreRelated.next(track);
   }
 }

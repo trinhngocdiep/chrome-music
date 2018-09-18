@@ -9,7 +9,7 @@ import { Runtime } from './runtime.service';
 })
 export class Navigation {
   private _navigate = new Subject<View>();
-  navigate$ = this._navigate.asObservable();
+  navigate$ = this._navigate.asObservable()
 
   navigate(view: View) {
     this._navigate.next(view);
@@ -20,16 +20,21 @@ export class Navigation {
   }
 
   openExplorer() {
-    this._navigate.next(View.explorer);
+    this.navigate(View.explorer);
   }
 
   openLibrary() {
-    this._navigate.next(View.library);
+    this.navigate(View.library);
   }
 
   openNoises() {
-    this._navigate.next(View.noises);
+    this.navigate(View.noises);
   }
+}
+
+export class NavigationEvent {
+  view: View;
+  data?: any;
 }
 
 export enum View {

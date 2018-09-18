@@ -87,12 +87,6 @@ export class MusicExplorerComponent {
         this.query.offset = result.offset;
         this.hasNoMoreData = this.content.tracks.length > 0 && result.end;
       });
-
-    this.eventBus.exploreMoreTrack$
-      .pipe(filter(e => !!e))
-      .subscribe(e => {
-        console.log('explore more track', e);
-      });
   }
 
   play(track: Track) {

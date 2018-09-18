@@ -1,7 +1,7 @@
 <div class="searchbox">
 
   <mat-form-field class="searchbox__term">
-    <mat-label>What are you looking for?</mat-label>
+    <mat-label>Track title, artist, etc.</mat-label>
     <input #searchInput matInput [(ngModel)]="state.term" [matAutocomplete]="searchAutoComplete" (keydown.enter)="acceptSearchTerm()">
     <mat-autocomplete #searchAutoComplete="matAutocomplete" (optionSelected)="acceptSearchTerm()">
       <mat-option *ngFor="let e of suggestions | async" [value]="e.value">
@@ -9,6 +9,14 @@
         <span>{{e.value}}</span>
       </mat-option>
     </mat-autocomplete>
+  </mat-form-field>
+
+  <mat-form-field class="searchbox__term" *ngIf="state.relatedTo">
+    <mat-label>Tracks like this</mat-label>
+    <mat-select placeholder="Tracks like this" [(value)]="state.relatedTo">
+      <mat-option>None</mat-option>
+      <mat-option *ngIf="state.relatedTo" [value]="state.relatedTo">{{state.relatedTo}}</mat-option>
+    </mat-select>
   </mat-form-field>
 
   <button mat-icon-button (click)="acceptSearchTerm()">

@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import {
   MatFormFieldModule, MatButtonModule, MatIconModule,
   MatCheckboxModule, MatMenuModule, MatInputModule, MAT_CHECKBOX_CLICK_ACTION,
-  MatSlideToggleModule, MatTooltipModule, MatAutocompleteModule,
+  MatSlideToggleModule, MatTooltipModule, MatAutocompleteModule, MatDividerModule, MatSelectModule,
 } from '@angular/material';
 
 import { SharedModule } from '../shared';
@@ -21,9 +21,11 @@ import { SearchboxComponent } from './searchbox/searchbox.component';
     MatButtonModule,
     MatCheckboxModule,
     MatMenuModule,
+    MatDividerModule,
     MatSlideToggleModule,
     MatTooltipModule,
     MatAutocompleteModule,
+    MatSelectModule,
 
     SharedModule,
   ],

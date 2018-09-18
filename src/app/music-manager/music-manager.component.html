@@ -63,8 +63,9 @@
 <mat-menu #trackMenu="matMenu">
   <ng-template matMenuContent let-track>
     <button mat-menu-item (click)="queue(track)">Queue</button>
+    <button mat-menu-item (click)="eventBus.exploreRelated(track)">Explore more tracks like this</button>
     <button mat-menu-item (click)="download.download(track)">Download</button>
     <button mat-menu-item (click)="navigation.openSource(track)">Open source</button>
-    <button mat-menu-item (click)="remove(track)">Remove from My Library</button>
+    <button mat-menu-item (click)="remove(track)">Remove</button>
   </ng-template>
 </mat-menu>

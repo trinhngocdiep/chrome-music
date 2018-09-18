@@ -17,9 +17,11 @@ export class AppComponent {
 
   @ViewChild('tabGroup') set tabGroup(tabGroup: MatTabGroup) {
     if (tabGroup) {
-      tabGroup.selectedTabChange.subscribe(e => this.navigation.navigate(e.index));
-      this.navigation.navigate$.subscribe(tabIndex => {
-        tabGroup.selectedIndex = tabIndex;
+      tabGroup.selectedTabChange.subscribe(e => {
+        this.navigation.navigate(e.index)
+      });
+      this.navigation.navigate$.subscribe(e => {
+        tabGroup.selectedIndex = e;
       });
     }
   }

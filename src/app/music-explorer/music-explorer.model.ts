@@ -2,6 +2,7 @@ import { Track } from 'src/engine';
 
 export class SearchQuery {
     term: string;
+    relatedTo: any;
     yt: boolean = true;
     sc: boolean = true;
     offset?: SearchQueryOffset;

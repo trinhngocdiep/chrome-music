@@ -6,5 +6,6 @@
 
 .searchbox__term {
   flex: 1;
-  margin-right: 4px;
+  margin-right: 8px;
+  height: 56px;
 }

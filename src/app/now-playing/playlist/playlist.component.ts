@@ -16,7 +16,7 @@ export class PlaylistComponent implements OnInit {
   constructor(
     private elementRef: ElementRef,
     private runtime: Runtime,
-    private eventBus: EventBus,
+    public eventBus: EventBus,
     public navigation: Navigation,
     public download: DownloadService,
   ) { }
@@ -34,7 +34,7 @@ export class PlaylistComponent implements OnInit {
   @ViewChild('searchInput') searchInput: ElementRef;
 
   ngOnInit() {
-    this.player = this.runtime.engine.musicPlayer;    
+    this.player = this.runtime.engine.musicPlayer;
     this.player.onPlaylistChange = tracks => this.playlist$.next(tracks);
     this.player.onPlaylistChange(this.player.playlist); // initialize the playlist
 
@@ -42,7 +42,7 @@ export class PlaylistComponent implements OnInit {
       this.index.updateIndex(tracks);
       this.hasPlaylist = tracks && tracks.length > 0;
     });
-    
+
     const filter$ = fromEvent<any>(this.searchInput.nativeElement, 'input')
       .pipe(
         map(e => e.target.value),
@@ -56,7 +56,10 @@ export class PlaylistComponent implements OnInit {
         map(() => this.index.search(this.filter, { active: 'title', direction: this.sortDirection }))
       ).subscribe(e => this.visibleTracks = e);
 
-    this.navigation.navigate$.pipe(filter(e => e == View.nowPlaying)).subscribe(() => this.scrollToActiveTrack());
+    this.navigation.navigate$
+      .pipe(
+        filter(e => e == View.nowPlaying)
+      ).subscribe(() => this.scrollToActiveTrack());
   }
 
   ngAfterViewInit() {
@@ -84,20 +87,12 @@ export class PlaylistComponent implements OnInit {
     this.eventBus.addToLib(track);
   }
 
-  findInLib(track: Track) {
-    this.eventBus.showLib(track);
-  }
-
-  findInExplorer(track: Track) {
-    this.eventBus.exploreMoreTrack(track);
-  }
-
   playAll() {
     if (!this.runtime.engine.playAllMusic()) {
       this.navigation.openExplorer();
     }
   }
-  
+
   private scrollToActiveTrack() {
     setTimeout(() => {
       const el: HTMLElement = this.elementRef.nativeElement.querySelector('.track .track__play-indicator');

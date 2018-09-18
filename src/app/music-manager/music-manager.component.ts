@@ -18,8 +18,8 @@ export class MusicManagerComponent {
     private elementRef: ElementRef,
     private snackBar: MatSnackBar,
     private runtime: Runtime,
-    private eventBus: EventBus,
     private musicManagerService: MusicManagerService,
+    public eventBus: EventBus,
     public navigation: Navigation,
     public download: DownloadService,
   ) { }
@@ -45,9 +45,9 @@ export class MusicManagerComponent {
       this.snackBar.open('Added to My Music');
     });
 
-    this.eventBus.showLib$.subscribe(track => {
-      this.navigation.openLibrary();
-      if (track) {
+    this.eventBus.showInLib$
+      .subscribe(track => {
+        this.navigation.openLibrary();
         setTimeout(() => {
           const trackRef: HTMLElement = this.elementRef.nativeElement.querySelector(`#${track.id}`);
           if (trackRef) {
@@ -58,8 +58,7 @@ export class MusicManagerComponent {
             this.snackBar.open(`Track not found ${track.title}`);
           }
         }, 500);
-      }
-    });
+      })
 
     const filter$ = fromEvent<any>(this.filterInput.nativeElement, 'input')
       .pipe(
