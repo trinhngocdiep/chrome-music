@@ -1,3 +1,5 @@
+<cm-related-explorer *ngIf="relatedToTrack" [baseTrack]="relatedToTrack" (close)="relatedToTrack = false"></cm-related-explorer>
+
 <div class="music-explorer" #container>
 
   <cm-explorer-searchbox class="music-explorer__searchbox"></cm-explorer-searchbox>
@@ -23,6 +25,9 @@
           </button>
           <button class="track__action" mat-icon-button (click)="$event.stopPropagation(); addToLib(e)" title="Add to My Music">
             <mat-icon>library_music</mat-icon>
+          </button>
+          <button class="track__action" mat-icon-button (click)="$event.stopPropagation(); eventBus.exploreRelated(e)" title="More tracks like this">
+            <mat-icon>navigate_next</mat-icon>
           </button>
         </div>
       </div>

@@ -10,15 +10,7 @@
       </mat-option>
     </mat-autocomplete>
   </mat-form-field>
-
-  <mat-form-field class="searchbox__term" *ngIf="state.relatedTo">
-    <mat-label>Tracks like this</mat-label>
-    <mat-select placeholder="Tracks like this" [(value)]="state.relatedTo">
-      <mat-option>None</mat-option>
-      <mat-option *ngIf="state.relatedTo" [value]="state.relatedTo">{{state.relatedTo}}</mat-option>
-    </mat-select>
-  </mat-form-field>
-
+  
   <button mat-icon-button (click)="acceptSearchTerm()">
     <mat-icon>search</mat-icon>
   </button>

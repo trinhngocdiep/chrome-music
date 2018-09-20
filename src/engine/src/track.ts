@@ -16,6 +16,7 @@ export class Track {
 
   // soundcloud
   stream_url?: string;
+  trackId?: string;
 
   // youtube
   videoId?: string;

@@ -1,55 +1,50 @@
-import { Component, ViewChild, ElementRef } from '@angular/core';
+import { Component, ViewChild, ElementRef, Input, Output, EventEmitter, SimpleChanges } from '@angular/core';
 import { MatSnackBar } from '@angular/material';
-import { fromEvent, merge, of } from 'rxjs';
-import { debounceTime, finalize, tap, switchMap, filter, first, catchError, startWith, concatMap } from 'rxjs/operators';
+import { fromEvent, merge, of, Subject } from 'rxjs';
+import { debounceTime, finalize, tap, switchMap, filter, catchError, startWith } from 'rxjs/operators';
 
 import { Track } from 'src/engine';
-import { EventBus, Runtime, Navigation, View } from 'src/app/core';
-import { SearchboxComponent } from './searchbox/searchbox.component';
-import { MusicExplorerService } from './music-explorer.service';
-import { SearchQuery, SearchResult } from './music-explorer.model';
+import { EventBus, Runtime, Navigation } from 'src/app/core';
+import { SearchResult, SearchQuery } from '../music-explorer.model';
+import { MusicExplorerService } from '../music-explorer.service';
 
 @Component({
-  selector: 'cm-music-explorer',
-  templateUrl: './music-explorer.component.html',
-  styleUrls: ['./music-explorer.component.css'],
-  providers: [MusicExplorerService]
+  selector: 'cm-related-explorer',
+  templateUrl: './related-explorer.component.html',
+  styleUrls: ['./related-explorer.component.css'],
 })
-export class MusicExplorerComponent {
+export class RelatedExplorerComponent {
+
   constructor(
     private snackBar: MatSnackBar,
     public eventBus: EventBus,
-    private navigation: Navigation,
     private runtime: Runtime,
     private musicExplorerService: MusicExplorerService
   ) { }
 
   @ViewChild('container') container: ElementRef;
-  @ViewChild(SearchboxComponent) searchBox: SearchboxComponent;
-  
-  relatedToTrack: Track;
-  
-  title: string;
+  @Input() baseTrack: Track;
+  @Output('close') close = new EventEmitter<void>();
+
   topLoaderVisible: boolean;
   botLoaderVisible: boolean;
   hasNoMoreData: boolean;
-  content: SearchResult = new SearchResult();
+  content: SearchResult;
   private query: SearchQuery;
+  private refresh$ = new Subject<void>();
+
+  ngOnChanges() {
+    this.refresh$.next();
+  }
 
   ngOnInit() {
-    this.eventBus.exploreRelated$.subscribe(e => {
-      this.navigation.openExplorer();
-      this.relatedToTrack = e;
-    });
-
-    const filter$ = this.searchBox.searchChange
+    const first$ = this.refresh$
       .pipe(
         startWith(null),
-        tap(query => {
-          this.query = query || this.searchBox.state;
-          this.content = new SearchResult();
+        tap(() => {
           this.topLoaderVisible = true;
-          setTimeout(() => this.scrollToTop());
+          this.query = { baseTrack: this.baseTrack };
+          this.content = new SearchResult();
         })
       );
 
@@ -65,7 +60,7 @@ export class MusicExplorerComponent {
         })
       );
 
-    const fetch$ = merge(filter$, next$)
+    merge(first$, next$)
       .pipe(
         switchMap(() => {
           return this.musicExplorerService.search(this.query)
@@ -82,18 +77,15 @@ export class MusicExplorerComponent {
               })
             );
         })
-      )
-
-    this.navigation.navigate$
-      .pipe(
-        first(e => e == View.explorer),
-        concatMap(() => fetch$)
       ).subscribe(result => {
-        this.title = this.query && this.query.term ? 'Search result' : 'Trending';
         this.content.tracks = this.content.tracks.concat(result.tracks);
         this.query.offset = result.offset;
         this.hasNoMoreData = this.content.tracks.length > 0 && result.end;
       });
+  }
+
+  back() {
+    this.close.emit();
   }
 
   play(track: Track) {

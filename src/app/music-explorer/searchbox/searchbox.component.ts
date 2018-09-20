@@ -34,13 +34,6 @@ export class SearchboxComponent implements OnInit {
   suggestions: Observable<Suggestion[]>;
 
   ngOnInit() {
-    this.eventBus.exploreRelated$
-      .subscribe(e => {
-        this.navigation.openExplorer();
-        console.log('search related to', e);
-        this.state.relatedTo = e;
-      });
-
     this.state = this.searchboxService.state;
     this.suggestions = fromEvent<any>(this.searchInput.nativeElement, 'input')
       .pipe(
@@ -69,7 +62,6 @@ export class SearchboxComponent implements OnInit {
   private emitQueryChange() {
     this.searchChange.emit({
       term: this.state.term,
-      relatedTo: this.state.relatedTo,
       yt: this.state.yt,
       sc: this.state.sc
     });

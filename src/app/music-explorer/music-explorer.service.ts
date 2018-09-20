@@ -31,39 +31,15 @@ export class MusicExplorerService {
         })
       );
   }
-  // first, populate the list with the selected item and then play it.
-  // this.player.playlist = [track];
-  // this.play(track);
 
-  // // populate the list with related items when they become available.
-  // this.apiService.getRelatedTracks(track)
-  //   .subscribe(data => {
-  //     if (data.tracks.length > 0) {
-  //       this.player.playlist = this.player.playlist.concat(data.tracks);
-  //       this.play(track);
-  //     }
-  //   });
-
-  //   if (!track.videoId) {
-  //     console.log('Cannot find related video for non-youtube track', track);
-  //     return of({ tracks: [], pageToken: null });
-  // }
-  // let findRelatedQuery = 'https://www.googleapis.com/youtube/v3/search?key=' + YT_KEY + '&maxResults=50&type=video&part=snippet&relatedToVideoId=' + track.videoId;
-  // return this._searchYt(findRelatedQuery, null);
-
-  //https://api.soundcloud.com/tracks/191477804/related?client_id=458dac111e2456c40805cd838f4548c1
   private searchYt(query: SearchQuery): Observable<YtSearchResult> {
-    if (
-      // YT disabled
-      !query.yt
-
-      // No more result
-      || (query.offset && !query.offset.yt)) {
-      return of(YtSearchResult.empty());
-    }
     const term = query.term || '';
     const offset = query.offset && query.offset.yt || '';
-    const queryString = `https://www.googleapis.com/youtube/v3/search?part=id&type=video,playlist&key=${ytApiKey}&maxResults=${queryLimit}&q=${term}&pageToken=${offset}`;
+    const queryString = getQueryString();
+
+    if (!queryString) {
+      return of(YtSearchResult.empty());
+    }
 
     return this.httpClient.get<any>(queryString)
       .pipe(
@@ -75,9 +51,9 @@ export class MusicExplorerService {
         }),
         mergeMap(e => {
           const videoIds = e.tracks.map(e => e.videoId).filter(e => !!e);
-          const videos$ = this.searchYtVideo(videoIds);
+          const videos$ = this.getYtTrackInfo(videoIds);
           const playlistIds = e.tracks.map(e => e.playlistId).filter(e => !!e);
-          const playlists$ = this.searchYtPlaylist(playlistIds);
+          const playlists$ = this.getYtPlaylistInfo(playlistIds);
           return forkJoin(videos$, playlists$)
             .pipe(
               map(data => {
@@ -89,9 +65,23 @@ export class MusicExplorerService {
             );
         })
       );
+
+    function getQueryString() {
+      // no more result
+      if (query.offset && !query.offset.yt) {
+        return null;
+      }
+      const baseQuery = `https://www.googleapis.com/youtube/v3/search?part=id&key=${ytApiKey}&maxResults=${queryLimit}&pageToken=${offset}`;
+      if (query.baseTrack && query.baseTrack.videoId) {
+        return `${baseQuery}&type=video&relatedToVideoId=${query.baseTrack.videoId}`;
+      } else if (!query.yt) {
+        return null;
+      }
+      return `${baseQuery}&type=video,playlist&q=${term}`;
+    }
   }
 
-  private searchYtVideo(videoIds: string[]): Observable<Track[]> {
+  private getYtTrackInfo(videoIds: string[]): Observable<Track[]> {
     if (videoIds.length == 0) {
       return of([]);
     }
@@ -114,7 +104,7 @@ export class MusicExplorerService {
       );
   }
 
-  private searchYtPlaylist(playlistIds: string[]): Observable<Track[]> {
+  private getYtPlaylistInfo(playlistIds: string[]): Observable<Track[]> {
     if (playlistIds.length == 0) {
       return of([]);
     }
@@ -135,24 +125,15 @@ export class MusicExplorerService {
           });
         })
       );
-    //// get playlist url
-    //.flatMap(playlists => {
-    //    this.http.get('https://www.googleapis.com/youtube/v3/playlistItems?key=' + YT_KEY + '&part=contentDetails&playlistId=' + playlistIds.join(','))
-    //})
   }
 
   private searchSc(query: SearchQuery): Observable<ScSearchResult> {
-    if (
-      // disabled
-      !query.sc
-
-      // No more result
-      || (query.offset && !query.offset.sc)) {
-      return of(ScSearchResult.empty());
-    }
     const term = query.term || '';
     const nextPageUrl = query.offset && query.offset.sc || '';
-    const queryString = nextPageUrl || `https://api.soundcloud.com/tracks?linked_partitioning=1&client_id=${scApiKey}&limit=${queryLimit}&q=${term}`;
+    const queryString = getQueryString();
+    if (!queryString) {
+      return of(ScSearchResult.empty());
+    }
     return this.httpClient.get<any>(queryString)
       .pipe(
         map(response => {
@@ -162,13 +143,14 @@ export class MusicExplorerService {
             .map(e => {
               const durationInSeconds = e.duration / 1000;
               return {
-                title: e.title.replace(/[^\x00-\x7F]/g, ''), // remove non-ASCII characters
+                title: e.title, //.replace(/[^\x00-\x7F]/g, ''), // remove non-ASCII characters
                 source: 'sc',
                 sourceName: 'SoundCloud',
                 sourceUrl: e.permalink_url,
                 durationInSeconds: durationInSeconds,
                 artworkUrl: e.artwork_url,
                 stream_url: e.uri + '/stream?client_id=' + scApiKey,
+                trackId: e.id
               };
             });
           let nextPageUrl = response.next_href;
@@ -178,6 +160,23 @@ export class MusicExplorerService {
           return { tracks: tracks, nextPageUrl: nextPageUrl };
         })
       );
+
+    function getQueryString() {
+      // No more result
+      if (query.offset && !query.offset.sc) {
+        return null;
+      }
+
+      // there is a base track and it's a SC track
+      if (query.baseTrack && query.baseTrack.stream_url) {
+        return `${query.baseTrack.stream_url.replace('/stream', '/related')}&linked_partitioning=1`;
+      } 
+      // SC is not enabled
+      else if (!query.sc) {
+        return null;
+      }
+      return nextPageUrl || `https://api.soundcloud.com/tracks?linked_partitioning=1&client_id=${scApiKey}&limit=${queryLimit}&q=${term}`;
+    }
   }
 }
 
