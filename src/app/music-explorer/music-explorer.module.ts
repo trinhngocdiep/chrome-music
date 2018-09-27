@@ -11,7 +11,6 @@ import { SharedModule } from '../shared';
 import { MusicExplorerComponent } from './music-explorer.component';
 import { SearchboxComponent } from './searchbox/searchbox.component';
 import { RelatedExplorerComponent } from './related-explorer/related-explorer.component';
-import { BaseExplorerComponent } from './base-explorer/base-explorer.component';
 
 @NgModule({
   imports: [
@@ -31,7 +30,7 @@ import { BaseExplorerComponent } from './base-explorer/base-explorer.component';
 
     SharedModule,
   ],
-  declarations: [MusicExplorerComponent, SearchboxComponent, RelatedExplorerComponent, BaseExplorerComponent],
+  declarations: [MusicExplorerComponent, SearchboxComponent, RelatedExplorerComponent],
   exports: [MusicExplorerComponent],
   providers: [
     { provide: MAT_CHECKBOX_CLICK_ACTION, useValue: 'noop' }

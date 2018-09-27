@@ -34,10 +34,6 @@ export class PlaylistComponent implements OnInit {
   @ViewChild('searchInput') searchInput: ElementRef;
 
   ngOnInit() {
-    this.player = this.runtime.engine.musicPlayer;
-    this.player.onPlaylistChange = tracks => this.playlist$.next(tracks);
-    this.player.onPlaylistChange(this.player.playlist); // initialize the playlist
-
     this.playlist$.subscribe(tracks => {
       this.index.updateIndex(tracks);
       this.hasPlaylist = tracks && tracks.length > 0;
@@ -60,6 +56,10 @@ export class PlaylistComponent implements OnInit {
       .pipe(
         filter(e => e == View.nowPlaying)
       ).subscribe(() => this.scrollToActiveTrack());
+
+    this.player = this.runtime.engine.musicPlayer;
+    this.player.onPlaylistChange = tracks => this.playlist$.next(tracks);
+    this.player.onPlaylistChange(this.player.playlist); // initialize the playlist
   }
 
   ngAfterViewInit() {
