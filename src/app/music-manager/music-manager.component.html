@@ -10,6 +10,7 @@
     <thead>
       <tr>
         <th class="col-title" mat-sort-header="title">Title</th>
+        <th class="col-source" mat-sort-header="sourceName">Source</th>
         <th class="col-length" mat-sort-header="durationInSeconds">Length</th>
         <th class="col-action">
           <button mat-icon-button [matMenuTriggerFor]="listMenu">
@@ -25,7 +26,14 @@
           <cm-soundbar class="play-indicator" *ngIf="isPlaying(row)"></cm-soundbar>
           <span>{{row.title}}</span>
         </td>
-        <td class="col-length">{{row.durationInSeconds | duration}}</td>
+        <td class="col-source">
+          <span>{{row.sourceName}}</span>
+        </td>
+        <td class="col-length">
+          <ng-container *ngIf="row.durationInSeconds">{{row.durationInSeconds | duration}}</ng-container>
+          <ng-container *ngIf="!row.durationInSeconds && row.durationInTrackCount">{{row.durationInTrackCount}} tracks</ng-container>
+          <ng-container *ngIf="!row.durationInSeconds && !row.durationInTrackCount">--</ng-container>
+        </td>
         <td class="col-action">
           <button mat-icon-button (click)="$event.stopPropagation(); queue(row)" title="Queue">
             <mat-icon>playlist_add</mat-icon>

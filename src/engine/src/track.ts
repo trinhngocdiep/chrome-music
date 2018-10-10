@@ -1,6 +1,7 @@
 export class Track {
   title: string;
   durationInSeconds: number;
+  durationInTrackCount?: number;
   source: string;
   sourceName: string;
   sourceUrl: string;

@@ -13,7 +13,8 @@
       <div class="track__thumb artwork">
         <img class="artwork__img" [src]="e.artworkUrl" *ngIf="e.artworkUrl">
         <div class="artwork__alt" *ngIf="!e.artworkUrl">{{e.sourceName || e.source}}</div>
-        <div class="artwork__subtitle">{{e.durationInSeconds | duration}}</div>
+        <div class="artwork__subtitle" *ngIf="e.durationInSeconds">{{e.durationInSeconds | duration}}</div>
+        <div class="artwork__subtitle" *ngIf="e.durationInTrackCount">{{e.durationInTrackCount}} tracks</div>
         <mat-icon class="artwork__overlay">play_arrow</mat-icon>
       </div>
       <div class="track__body">

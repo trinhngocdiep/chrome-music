@@ -18,9 +18,9 @@ export class NowPlayingComponent {
     public navigation: Navigation,
   ) { }
 
-  @ViewChild('progressBar') progressBar;
-
   player: MusicPlayer;
+  trackProgress;
+  playlistProgress;
 
   ngOnInit() {
     this.engageEngine();
@@ -31,6 +31,8 @@ export class NowPlayingComponent {
   }
 
   play() {
+    this.trackProgress = null;
+    this.playlistProgress = null;
     this.player.play(this.player.currentTrack);
   }
 
@@ -43,44 +45,49 @@ export class NowPlayingComponent {
   }
 
   private engageEngine() {
+    this.trackProgress = null;
+    this.playlistProgress = null;
+
     this.player = this.runtime.engine.musicPlayer;
-    this.player.onPlay = () => {
-      console.debug('onPlay');
+
+    this.player.onPlay = (track) => {
       this.ngZone.run(() => {
         this.player.playing = true;
-        // reset progress
-        if (this.progressBar) {
-          this.progressBar.min = -1;
-          this.progressBar.max = 0;
-          this.progressBar.value = -1;
+        this.trackProgress = { min: -1, max: 0, value: -1 };
+        if (!track.playlistId) {
+          this.playlistProgress = null;
         }
       });
     };
+
     this.player.onPause = () => {
-      console.debug('onPause');
       this.ngZone.run(() => {
         this.player.playing = false;
       });
     };
-    this.player.onProgress = (track, currentTime) => {
-      console.debug('onProgress', currentTime);
-      this.ngZone.run(() => {
 
+    this.player.onProgress = (track, currentTime, totalTime) => {
+      this.ngZone.run(() => {
         this.player.playing = true;
-
-        // update progress bar's max and initial value
-        if (this.progressBar && track.durationInSeconds) {
-          this.progressBar.max = track.durationInSeconds;
-          this.progressBar.value = currentTime;
-        }
+        this.trackProgress = { min: 0, max: totalTime, value: currentTime };
       });
     };
+
+    this.player.onPlaylistProgress = (track, playlist, index) => {
+      console.debug('onPlaylistProgress', playlist.length, index)
+      const total = playlist.length;
+      this.ngZone.run(() => {
+        track.durationInTrackCount = total;
+        this.playlistProgress = { index, total };
+      });
+    };
+
     this.player.onEnd = () => {
-      console.debug('onEnd');
       this.ngZone.run(() => {
         this.player.playing = false;
       });
     };
+
     this.player.onError = (error) => {
       this.ngZone.run(() => {
         this.player.playing = false;

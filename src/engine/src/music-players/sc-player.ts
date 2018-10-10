@@ -4,7 +4,7 @@ import { Track } from '../track';
 export class ScPlayer implements Player {
   constructor(private listener: PlayerListener) {
     this.audio.ontimeupdate = () => {
-      listener.onProgress(this, this.audio.currentTime);
+      listener.onProgress(this, this.audio.currentTime, this.audio.duration);
     };
     this.audio.onpause = () => {
       listener.onPause(this);
@@ -57,4 +57,12 @@ export class ScPlayer implements Player {
   setVolume(volume) {
     this.audio.volume = volume;
   };
+
+  next() {
+    throw 'Not supported';
+  }
+
+  prev() {
+    throw 'Not supported';
+  }
 }

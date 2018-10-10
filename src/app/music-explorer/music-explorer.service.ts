@@ -43,23 +43,28 @@ export class MusicExplorerService {
 
     return this.httpClient.get<any>(queryString)
       .pipe(
-        map(e => {
+        map(response => {
           return {
-            tracks: e.items.map(e => ({ videoId: e.id.videoId || e.id, playlistId: e.id.playlistId })),
-            nextPageToken: e.nextPageToken
+            ids: response.items.map(e => {
+              return {
+                videoId: e.id.videoId || (e.contentDetails && e.contentDetails.videoId),
+                playlistId: e.id.playlistId
+              };
+            }),
+            nextPageToken: response.nextPageToken
           }
         }),
-        mergeMap(e => {
-          const videoIds = e.tracks.map(e => e.videoId).filter(e => !!e);
+        mergeMap(response => {
+          const videoIds = response.ids.map(e => e.videoId).filter(e => !!e);
           const videos$ = this.getYtTrackInfo(videoIds);
-          const playlistIds = e.tracks.map(e => e.playlistId).filter(e => !!e);
+          const playlistIds = response.ids.map(e => e.playlistId).filter(e => !!e);
           const playlists$ = this.getYtPlaylistInfo(playlistIds);
           return forkJoin(videos$, playlists$)
             .pipe(
               map(data => {
                 return {
                   tracks: data[0].concat(data[1]),
-                  nextPageToken: e.nextPageToken
+                  nextPageToken: response.nextPageToken
                 }
               })
             );
@@ -71,13 +76,18 @@ export class MusicExplorerService {
       if (query.offset && !query.offset.yt) {
         return null;
       }
-      const baseQuery = `https://www.googleapis.com/youtube/v3/search?part=id&key=${ytApiKey}&maxResults=${queryLimit}&pageToken=${offset}`;
-      if (query.baseTrack && query.baseTrack.videoId) {
-        return `${baseQuery}&type=video&relatedToVideoId=${query.baseTrack.videoId}`;
+      if (query.baseTrack) {
+        if (query.baseTrack.videoId) {
+          return `https://www.googleapis.com/youtube/v3/search?key=${ytApiKey}&maxResults=${queryLimit}&part=id&pageToken=${offset}&type=video&relatedToVideoId=${query.baseTrack.videoId}`;
+        }
+        if (query.baseTrack.playlistId) {
+          return `https://www.googleapis.com/youtube/v3/playlistItems?key=${ytApiKey}&part=contentDetails&maxResults=${queryLimit}&pageToken=${offset}&playlistId=${query.baseTrack.playlistId}`;
+        }
+        return null;
       } else if (!query.yt) {
         return null;
       }
-      return `${baseQuery}&type=video,playlist&q=${term}`;
+      return `https://www.googleapis.com/youtube/v3/search?key=${ytApiKey}&maxResults=${queryLimit}&pageToken=${offset}&part=id&type=video,playlist&q=${term}`;
     }
   }
 
@@ -108,7 +118,7 @@ export class MusicExplorerService {
     if (playlistIds.length == 0) {
       return of([]);
     }
-    return this.httpClient.get<any>(`https://www.googleapis.com/youtube/v3/playlists?key=${ytApiKey}&part=snippet&id=${playlistIds.join(',')}`)
+    return this.httpClient.get<any>(`https://www.googleapis.com/youtube/v3/playlists?key=${ytApiKey}&part=snippet,contentDetails&id=${playlistIds.join(',')}`)
       .pipe(
         map(e => e.items as any[]),
         map(e => {
@@ -119,6 +129,7 @@ export class MusicExplorerService {
               sourceName: 'YouTube',
               sourceUrl: `https://www.youtube.com/results?search_query=${e.id}`,
               durationInSeconds: 0,
+              durationInTrackCount: e.contentDetails.itemCount,
               artworkUrl: e.snippet.thumbnails.default.url,
               playlistId: e.id,
             };
@@ -170,7 +181,7 @@ export class MusicExplorerService {
       // there is a base track and it's a SC track
       if (query.baseTrack && query.baseTrack.stream_url) {
         return `${query.baseTrack.stream_url.replace('/stream', '/related')}&linked_partitioning=1`;
-      } 
+      }
       // SC is not enabled
       else if (!query.sc) {
         return null;

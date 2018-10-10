@@ -12,7 +12,7 @@ export class Searcher {
   updateIndex(tracks: Track[]) {
     this.tracks = tracks;
     this.targets = tracks.map(e => {
-      return { origin: e, title: sanitizeSearchString(e.title) };
+      return { origin: e, title: sanitizeSearchString(e.title), sourceName: e.sourceName };
     });
   }
 
@@ -25,7 +25,7 @@ export class Searcher {
     if (!filter) {
       return this.tracks;
     }
-    return this.index.go(filter, this.targets, { key: 'title' }).map(e => e.obj.origin);
+    return this.index.go(filter, this.targets, { keys: ['sourceName', 'title'] }).map(e => e.obj.origin);
   }
 }
 
@@ -46,12 +46,8 @@ function doSort(tracks: Track[], sort: Sort): Track[] {
     return sortAscending ? tracks.sort((a, b) => a.durationInSeconds - b.durationInSeconds)
       : tracks.sort((b, a) => a.durationInSeconds - b.durationInSeconds);
   }
-  if (sortField == 'title') {
-    return sortAscending ? tracks.sort((a, b) => a.title.localeCompare(b.title))
-      : tracks.sort((b, a) => a.title.localeCompare(b.title));
-  }
-  console.warn('Unsupported sort field', sortField);
-  return tracks;
+  return sortAscending ? tracks.sort((a, b) => a[sortField].localeCompare(b[sortField]))
+    : tracks.sort((b, a) => a[sortField].localeCompare(b[sortField]));
 }
 
 class SearchableTrack {

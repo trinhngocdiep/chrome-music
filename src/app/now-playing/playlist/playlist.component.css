@@ -92,7 +92,8 @@
 }
 
 .track__duration {
-  max-width: 10em;
+  min-width: 4em;
+  max-width: 4em;
   text-align: right;
   font-size: 0.8em;
 }

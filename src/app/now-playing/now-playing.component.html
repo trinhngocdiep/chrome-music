@@ -1,18 +1,13 @@
 <div class="now-playing">
 
   <div class="player now-playing__player">
-    <div class="player__empty">
-      <mat-icon class="player__empty-artwork material-icons" *ngIf="!player.currentTrack">music_note</mat-icon>
-    </div>
-
-    <ng-container *ngIf="player.currentTrack">
-      <div class="player__title">{{player.currentTrack.title}}</div>
+    <ng-container *ngIf="player.currentTrack as track; else emptyArtwork">
+      <div class="player__title">{{track.title}}</div>
       <div class="player__other-actions">
-        <span class="player__other-actions-item" title="Download" (click)="download.download(player.currentTrack)">
+        <span class="player__other-actions-item" title="Download" (click)="download.download(track)">
           <mat-icon>file_download</mat-icon>
         </span>
-        <span class="player__other-actions-item" [title]="'Open in ' + (player.currentTrack.source == 'sc' ? 'SoundCloud' : 'YouTube')"
-          (click)="navigation.openSource(player.currentTrack)">
+        <span class="player__other-actions-item" [title]="'Open in ' + (track.source == 'sc' ? 'SoundCloud' : 'YouTube')" (click)="navigation.openSource(track)">
           <mat-icon>open_in_new</mat-icon>
         </span>
         <span class="player__other-actions-item" title="Configure background noises" (click)="navigation.openNoises()">
@@ -20,13 +15,15 @@
         </span>
       </div>
       <div class="player__artwork">
-        <img class="player__artwork-img" [src]="player.currentTrack.artworkUrl" *ngIf="player.currentTrack.artworkUrl">
-        <mat-icon class="player__empty-artwork" *ngIf="!player.currentTrack.artworkUrl">music_note</mat-icon>
-        <div class="player__progress-text" *ngIf="progressBar">{{progressBar.value | duration}} / {{progressBar.max | duration}}</div>
+        <img class="player__artwork-img" [src]="track.artworkUrl" *ngIf="track.artworkUrl">
+        <mat-icon class="player__empty-artwork" *ngIf="!track.artworkUrl">music_note</mat-icon>
+        <div class="player__progress-text" *ngIf="trackProgress">{{trackProgress.value | duration}} / {{trackProgress.max | duration}}</div>
+        <div class="player__playlist-progress-text" *ngIf="playlistProgress">{{playlistProgress.index+1}} of {{ playlistProgress.total}} tracks</div>
       </div>
-      <mat-slider class="player__progress-bar" #progressBar min="-1" value="-1" max="0" (change)="seek($event.value)"></mat-slider>
+      <mat-slider class="player__progress-bar" *ngIf="trackProgress" [min]="trackProgress.min" [max]="trackProgress.max" [value]="trackProgress.value"
+        (change)="seek($event.value)"></mat-slider>
       <div class="player__track-controls">
-        <button mat-icon-button (click)="player.previous()">
+        <button mat-icon-button (click)="player.previous(false)">
           <mat-icon class="player__control-icon">skip_previous</mat-icon>
         </button>
         <button mat-icon-button *ngIf="!player.playing" (click)="play()">
@@ -35,7 +32,7 @@
         <button mat-icon-button *ngIf="player.playing" (click)="pause()">
           <mat-icon class="player__control-icon">pause</mat-icon>
         </button>
-        <button mat-icon-button (click)="player.next()">
+        <button mat-icon-button (click)="player.next(false)">
           <mat-icon class="player__control-icon">skip_next</mat-icon>
         </button>
       </div>
@@ -48,8 +45,16 @@
         </mat-button-toggle>
       </div>
     </ng-container>
+
+
   </div>
 
   <cm-playlist class="now-playing__playlist"></cm-playlist>
 
 </div>
+
+<ng-template #emptyArtwork>
+  <div class="player__empty">
+    <mat-icon class="player__empty-artwork material-icons">music_note</mat-icon>
+  </div>
+</ng-template>

@@ -4,6 +4,8 @@ import { UserStorage } from './user-storage';
 import { Track } from './track';
 
 export class Engine {
+  constructor() {
+  }
   musicPlayer: MusicPlayer = new MusicPlayer();
   noisePlayer: NoisePlayer = new NoisePlayer();
   storage: any = {};
@@ -18,7 +20,6 @@ export class Engine {
   });
 
   playAllMusic(): boolean {
-    console.log('playAllMusic');
     const library = this.storage.library;
     const tracks: Track[] = library && library.tracks;
     if (tracks && tracks.length > 0) {

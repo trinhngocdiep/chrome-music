@@ -91,7 +91,7 @@ export class MusicManagerComponent {
   }
 
   play(track?: Track) {
-    this.player.playlist = this.filteredTracks;
+    this.player.playlist = track ? [track] : this.filteredTracks;
     this.player.play(track || this.player.playlist[0]);
   }
 
@@ -114,7 +114,7 @@ export class MusicManagerComponent {
           })
         } else {
           // do remove
-          this.musicManagerService.remove([track]);
+          this.musicManagerService.remove(track);
         }
       });
   }

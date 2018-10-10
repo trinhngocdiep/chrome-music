@@ -2,31 +2,11 @@ import { Player, PlayerListener } from './player';
 import { Track } from '../track';
 
 const proxyUrl = 'https://hdmusic.neocities.org';
+// const proxyUrl = 'http://localhost:8080/yt-proxy.html';
 
 export class YtPlayer implements Player {
   constructor(private listener: PlayerListener) {
-    window.onload = () => {
-      console.debug('creating proxy', proxyUrl);
-      const iframe = document.createElement('iframe');
-      iframe.width = '100%';
-      iframe.height = '500';
-      iframe.src = proxyUrl;
-      iframe.style.display = 'none';
-      document.body.appendChild(iframe);
-      this.proxy = iframe.contentWindow;
-    };
-
-    window.addEventListener('message', (message) => {
-      console.debug('background player received message', message);
-      const origin = message.origin;
-      const data = message.data;
-      // ignore messages from youtube iframe
-      if (origin != proxyUrl) {
-        return;
-      }
-      // dispatch messages from our proxy page
-      this.dispatch(data.event, data.data);
-    });
+    this.createProxy();
   }
 
   private proxy: Window;
@@ -36,26 +16,59 @@ export class YtPlayer implements Player {
   }
 
   play(track: Track) {
-    this.postMessageToProxy({ command: 'play', data: track });
+    this.sendMessage('play', track);
   }
 
   resume(track: Track) {
-    this.postMessageToProxy({ command: 'resume', data: track });
+    this.sendMessage('resume', track);
   }
 
   pause() {
-    this.postMessageToProxy({ command: 'pause' });
+    this.sendMessage('pause');
   }
 
   seek(time) {
-    this.postMessageToProxy({ command: 'seek', data: time });
+    this.sendMessage('seek', time);
   }
 
   setVolume(volume) {
-    this.postMessageToProxy({ command: 'setVolume', data: volume });
+    this.sendMessage('setVolume', volume);
   }
 
-  private dispatch(event, data) {
+  next() {
+    this.sendMessage('next');
+  }
+
+  prev() {
+    this.sendMessage('prev');
+  }
+
+  private createProxy() {
+    console.log('creating proxy', proxyUrl);
+    window.onload = () => {
+      const iframe = document.createElement('iframe');
+      iframe.src = proxyUrl;
+      iframe.width = '100%';
+      iframe.height = '400';
+      // iframe.style.display = 'none';
+      iframe.onload = () => {
+        console.log('proxy ready');
+        this.proxy = iframe.contentWindow;
+      }
+      document.body.appendChild(iframe);
+    }
+    window.addEventListener('message', (message) => this.handleMessage(message));
+  }
+
+  private handleMessage(message) {
+    // ignore messages from youtube iframe
+    const messageOrigin = message.origin;
+    if (messageOrigin != proxyUrl) {
+      return;
+    }
+    const messageData = message.data;
+    const event = messageData.event;
+    const data = messageData.data;
     switch (event) {
       case 'onPlay': {
         this.listener.onPlay(this);
@@ -74,18 +87,21 @@ export class YtPlayer implements Player {
         break;
       }
       case 'onProgress': {
-        this.listener.onProgress(this, data);
+        this.listener.onProgress(this, data.currentTime, data.totalTime);
         break;
       }
+      case 'onPlaylistProgress':
+        this.listener.onPlaylistProgress(this, data.playlist, data.playlistIndex);
+        break;
     }
   }
 
-  private postMessageToProxy(message) {
+  private sendMessage(command: string, data?: any) {
     if (!this.proxy) {
       console.log('Proxy window is not ready');
-      this.listener.onError(this, 'Player is not ready');
+      this.listener.onError(this, 'Player is not ready yet');
       return;
     }
-    this.proxy.postMessage(message, '*');
+    this.proxy.postMessage({ command: command, data: data }, '*');
   }
 }

@@ -3,13 +3,7 @@ import { Player, PlayerListener } from './music-players/player';
 import { ScPlayer } from './music-players/sc-player';
 import { YtPlayer } from './music-players/yt-player';
 
-const delayAfterError = 5000;
-
 export class MusicPlayer {
-
-  constructor() {
-    this.players = [new ScPlayer(this.playersMediator), new YtPlayer(this.playersMediator)];
-  }
 
   volume: number = 1;
 
@@ -34,16 +28,21 @@ export class MusicPlayer {
   onError: Function;
   onStatusChange: Function;
   onProgress: Function;
+  onPlaylistProgress: Function;
   onPlaylistChange: Function;
 
-  private players: Player[];
-  private currentPlayer: Player;
+  // propagates events from internal players to external listeners
   private playersMediator: PlayerListener = {
     onPlay: (player: Player) => {
       this.playing = true;
+      this.currentTrack.error = null;
       this.onPlay && this.onPlay(this.currentTrack);
       this.onStatusChange && this.onStatusChange();
       player.setVolume(this.volume);
+      if (player != this.currentPlayer) {
+        console.log('player comeback', player);
+        player.pause();
+      }
     },
     onPause: (player: Player) => {
       this.playing = false;
@@ -66,20 +65,19 @@ export class MusicPlayer {
       this.currentTrack.error = `[PLAY_ERROR] ${error || 'Track not playable'}`;
       this.onError && this.onError(error);
       this.onStatusChange && this.onStatusChange();
-      setTimeout(() => this.next(), delayAfterError);
+      this.next();
     },
-    onProgress: (player: Player, time: number) => {
-      this.onProgress && this.onProgress(this.currentTrack, time);
+    onProgress: (player: Player, currentTime: number, totalTime: number) => {
+      this.onProgress && this.onProgress(this.currentTrack, currentTime, totalTime);
     },
+    onPlaylistProgress: (player: Player, playlist: string[], playlistIndex: number) => {
+      this.onPlaylistProgress && this.onPlaylistProgress(this.currentTrack, playlist, playlistIndex);
+    }
   };
+  private players: Player[] = [new ScPlayer(this.playersMediator), new YtPlayer(this.playersMediator)];
+  private currentPlayer: Player;
 
   play(track: Track, force: boolean = false) {
-    if (track.error) {
-      console.log('Will not play errornous track', track);
-      setTimeout(() => this.next(), delayAfterError);
-      return;
-    }
-
     if (!force && track == this.currentTrack) {
       // resume the currently paused track
       if (!this.playing) {
@@ -95,9 +93,9 @@ export class MusicPlayer {
     }
 
     this.players.filter(e => e != player).forEach(e => e.pause());
-    player.play(track);
     this._currentTrack = track;
     this.currentPlayer = player;
+    player.play(track);
     if (force) {
       this.playlist = [track];
     }
@@ -111,8 +109,12 @@ export class MusicPlayer {
     this.currentPlayer && this.currentPlayer.pause();
   }
 
-  next() {
-    if (!this.currentTrack || !this.playlist || this.playlist.length == 0) {
+  next(skipPlaylist: boolean = true) {
+    if (!this.currentTrack || !this.playlist || !this.playlist.length) {
+      return;
+    }
+    if (!skipPlaylist && this.currentTrack.playlistId) {
+      this.currentPlayer.next();
       return;
     }
     const currentIndex = this.playlist.indexOf(this.currentTrack);
@@ -125,11 +127,12 @@ export class MusicPlayer {
     this.play(nextTrack || this.playlist[0]);
   }
 
-  previous() {
-    if (!this.playlist || this.playlist.length == 0) {
+  previous(skipPlaylist: boolean = true) {
+    if (!this.currentTrack || !this.playlist || !this.playlist.length) {
       return;
     }
-    if (!this.currentTrack) {
+    if (!skipPlaylist && this.currentTrack.playlistId) {
+      this.currentPlayer.prev();
       return;
     }
     const currentIndex = this.playlist.indexOf(this.currentTrack);
