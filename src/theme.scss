@@ -10,6 +10,11 @@ $theme: mat-light-theme($primary, $accent, $warn);
 
 @include angular-material-theme($theme);
 
+:root {
+  --primary-color: #1b5e20;
+  --secondary-color: #a5d6a7;
+}
+
 .mat-cell,
 .mat-header-cell {
   overflow: hidden;
@@ -62,4 +67,9 @@ $theme: mat-light-theme($primary, $accent, $warn);
 
 .mat-form-field-suffix .mat-icon-button {
   font-size: 1.5em !important;
+}
+
+input {
+  caret-color: var(--primary-color);
+  outline-color: var(--primary-color);
 }

@@ -1,22 +1,33 @@
-@import './theme.scss';
 @import url('https://fonts.googleapis.com/css?family=Roboto');
 @import url('https://fonts.googleapis.com/icon?family=Material+Icons');
+@import '~@angular/material/theming';
 
-* {
-  box-sizing: border-box;
-}
+@include mat-core();
 
-html,
-body {
-  margin: 0;
-  font: 500 14px/22px Roboto, "Helvetica Neue", sans-serif;
-  width: 600px;
-  height: 500px;
-  overflow: hidden;
-}
+$primary: mat-palette($mat-green,
+900);
+$accent: mat-palette($mat-green,
+200);
+$warn: mat-palette($mat-red);
 
-button:focus {
-  outline: none;
+$theme: mat-light-theme($primary,
+$accent,
+$warn);
+
+@include angular-material-theme($theme);
+
+$primary-color: #1b5e20;
+$secondary-color: #a5d6a7;
+$viewport-width: 600px;
+$viewport-height: 500px;
+$content-height: 450px;
+
+:root {
+  --primary-color: #{$primary-color};
+  --secondary-color: #{$secondary-color};
+  --viewport-width: #{$viewport-width};
+  --viewport-height: $viewport-height;
+  --content-height: #{$content-height};
 }
 
 ::-webkit-scrollbar {
@@ -30,7 +41,40 @@ button:focus {
   border-radius: 3px;
 }
 
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  font: 500 14px/22px Roboto, "Helvetica Neue", sans-serif;
+  width: $viewport-width;
+  height: $viewport-height; // overflow: hidden;
+}
+
 cm-app {
   background: white;
   display: block;
+}
+
+input {
+  caret-color: $primary-color;
+  outline-color: $primary-color;
+}
+
+.mat-tab-label {
+  min-width: 150px !important;
+}
+
+.mat-button-toggle {
+  color: inherit;
+}
+
+.mat-button-toggle+.mat-button-toggle {
+  margin-left: 8px;
+}
+
+.mat-button-toggle-checked {
+  color: mat-color($primary, 1);
 }

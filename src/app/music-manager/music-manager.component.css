@@ -1,6 +1,6 @@
 .container {
   padding: 0 8px 24px;
-  height: 450px;
+  height: var(--content-height);
   overflow: auto;
 }
 

@@ -10,7 +10,7 @@ export class DurationPipe {
 export function secondsToHHMMSS(timeInSeconds) {
   let total = parseInt(timeInSeconds, 10);
   if (!total || total <= 0) {
-    return '--:--';
+    return '--';
   }
   let hours: any = Math.floor(total / 3600);
   let minutes: any = Math.floor((total - (hours * 3600)) / 60);

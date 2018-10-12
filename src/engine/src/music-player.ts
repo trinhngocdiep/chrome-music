@@ -3,6 +3,8 @@ import { Player, PlayerListener } from './music-players/player';
 import { ScPlayer } from './music-players/sc-player';
 import { YtPlayer } from './music-players/yt-player';
 
+const autoPlayBackoffInterval = 1000;
+
 export class MusicPlayer {
 
   volume: number = 1;
@@ -65,7 +67,26 @@ export class MusicPlayer {
       this.currentTrack.error = `[PLAY_ERROR] ${error || 'Track not playable'}`;
       this.onError && this.onError(error);
       this.onStatusChange && this.onStatusChange();
-      this.next();
+
+      // schedule an autoplay if there isn't one already
+      if (!this.autoPlayScheduler) {
+        console.log('creating scheduler after', this.autoPlayBackoffInterval);
+
+        this.autoPlayScheduler = setTimeout(() => {
+          console.log('executing scheduler', this.autoPlayScheduler);
+
+          this.autoPlayScheduler = null;
+
+          if (this.lastCommand == 'prev') {
+            this.previous();
+          } else {
+            this.next();
+          }
+        }, this.autoPlayBackoffInterval);
+
+        // increase the delay
+        this.autoPlayBackoffInterval *= 2;
+      }
     },
     onProgress: (player: Player, currentTime: number, totalTime: number) => {
       this.onProgress && this.onProgress(this.currentTrack, currentTime, totalTime);
@@ -76,8 +97,20 @@ export class MusicPlayer {
   };
   private players: Player[] = [new ScPlayer(this.playersMediator), new YtPlayer(this.playersMediator)];
   private currentPlayer: Player;
+  private lastCommand: string;
+  private autoPlayScheduler: any;
+  private autoPlayBackoffInterval: number = autoPlayBackoffInterval;
+
+  private resetAutoPlayScheduler() {
+    console.log('resetAutoPlayScheduler');
+    this.autoPlayBackoffInterval = autoPlayBackoffInterval;
+    this.autoPlayScheduler && clearTimeout(this.autoPlayScheduler);
+    this.autoPlayScheduler = null;
+  }
 
   play(track: Track, force: boolean = false) {
+    console.log('play');
+    
     if (!force && track == this.currentTrack) {
       // resume the currently paused track
       if (!this.playing) {
@@ -99,17 +132,23 @@ export class MusicPlayer {
     if (force) {
       this.playlist = [track];
     }
+
+    this.resetAutoPlayScheduler();
   }
 
   resume() {
+    console.log('resume');
     this.currentPlayer && this.currentPlayer.resume(this.currentTrack);
+    // this.resetAutoPlayScheduler();
   }
 
   pause() {
     this.currentPlayer && this.currentPlayer.pause();
+    // this.resetAutoPlayScheduler();
   }
 
   next(skipPlaylist: boolean = true) {
+    console.log('next');
     if (!this.currentTrack || !this.playlist || !this.playlist.length) {
       return;
     }
@@ -133,6 +172,7 @@ export class MusicPlayer {
     }
     if (!skipPlaylist && this.currentTrack.playlistId) {
       this.currentPlayer.prev();
+      this.lastCommand = 'prev';
       return;
     }
     const currentIndex = this.playlist.indexOf(this.currentTrack);
@@ -142,6 +182,7 @@ export class MusicPlayer {
     }
     if (previousTrack) {
       this.play(previousTrack);
+      this.lastCommand = 'prev';
     }
   }
 

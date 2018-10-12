@@ -1,5 +1,5 @@
 .container {
-  height: 450px;
+  height: var(--content-height);
   display: flex;
   flex-direction: column;
 }
@@ -27,6 +27,10 @@
   cursor: pointer;
 }
 
+.container__controls-mute_active {
+  color: var(--primary-color);
+}
+
 .container__noises {
   flex: 1;
   display: flex;
@@ -35,4 +39,33 @@
   align-items: center;
   justify-content: center;
   align-content: space-evenly;
+}
+
+.noise {
+  width: 120px;
+  height: 100px;
+  cursor: pointer;
+  opacity: 0.3;
+  margin: 8px;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  transition: opacity 0.3s ease;
+}
+
+.noise_playing {
+  opacity: 1;
+}
+
+.noise__icon {
+  width: 50%;
+}
+
+.noise__volume {
+  min-width: 100%;
+  display: none;
+}
+
+.noise_playing .noise__volume {
+  display: block;
 }

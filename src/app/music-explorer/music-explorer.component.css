@@ -8,13 +8,20 @@ cm-related-explorer {
 }
 
 .music-explorer {
-  padding: 8px;
-  height: 450px;
+  height: var(--content-height);
   overflow: auto;
 }
 
 .music-explorer__searchbox {
   display: block;
+  padding: 8px;
+  position: sticky;
+  top: 0;
+  z-index: 9;
+  background: white;
+}
+.music-explorer__content {
+  padding: 8px;
 }
 
 .title {

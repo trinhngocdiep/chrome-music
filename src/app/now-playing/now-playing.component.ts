@@ -19,7 +19,7 @@ export class NowPlayingComponent {
   ) { }
 
   player: MusicPlayer;
-  trackProgress;
+  trackProgress = { min: -1, max: 0, value: -1 };
   playlistProgress;
 
   ngOnInit() {
@@ -31,7 +31,6 @@ export class NowPlayingComponent {
   }
 
   play() {
-    this.trackProgress = null;
     this.playlistProgress = null;
     this.player.play(this.player.currentTrack);
   }
@@ -45,9 +44,6 @@ export class NowPlayingComponent {
   }
 
   private engageEngine() {
-    this.trackProgress = null;
-    this.playlistProgress = null;
-
     this.player = this.runtime.engine.musicPlayer;
 
     this.player.onPlay = (track) => {

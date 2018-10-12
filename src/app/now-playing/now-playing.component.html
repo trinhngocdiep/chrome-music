@@ -10,17 +10,17 @@
         <span class="player__other-actions-item" [title]="'Open in ' + (track.source == 'sc' ? 'SoundCloud' : 'YouTube')" (click)="navigation.openSource(track)">
           <mat-icon>open_in_new</mat-icon>
         </span>
-        <span class="player__other-actions-item" title="Configure background noises" (click)="navigation.openNoises()">
+        <span class="player__other-actions-item" title="Configure background effects" (click)="navigation.openNoises()">
           <mat-icon>surround_sound</mat-icon>
         </span>
       </div>
       <div class="player__artwork">
         <img class="player__artwork-img" [src]="track.artworkUrl" *ngIf="track.artworkUrl">
         <mat-icon class="player__empty-artwork" *ngIf="!track.artworkUrl">music_note</mat-icon>
-        <div class="player__progress-text" *ngIf="trackProgress">{{trackProgress.value | duration}} / {{trackProgress.max | duration}}</div>
+        <div class="player__progress-text">{{trackProgress.value | duration}} / {{trackProgress.max | duration}}</div>
         <div class="player__playlist-progress-text" *ngIf="playlistProgress">{{playlistProgress.index+1}} of {{ playlistProgress.total}} tracks</div>
       </div>
-      <mat-slider class="player__progress-bar" *ngIf="trackProgress" [min]="trackProgress.min" [max]="trackProgress.max" [value]="trackProgress.value"
+      <mat-slider class="player__progress-bar" [min]="trackProgress.min" [max]="trackProgress.max" [value]="trackProgress.value"
         (change)="seek($event.value)"></mat-slider>
       <div class="player__track-controls">
         <button mat-icon-button (click)="player.previous(false)">

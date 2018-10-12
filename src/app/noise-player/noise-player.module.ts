@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { MatIconModule, MatSliderModule } from '@angular/material';
 
 import { SharedModule } from '../shared';
-import { NoiseComponent } from './noise.component';
 import { NoisePlayerComponent } from './noise-player.component';
 
 @NgModule({
@@ -14,7 +13,7 @@ import { NoisePlayerComponent } from './noise-player.component';
 
     SharedModule,
   ],
-  declarations: [NoisePlayerComponent, NoiseComponent],
+  declarations: [NoisePlayerComponent],
   exports: [NoisePlayerComponent]
 })
 export class NoisePlayerModule {

@@ -1,8 +1,8 @@
-import { Component, ViewChildren } from '@angular/core';
+import { Component } from '@angular/core';
 import { first } from 'rxjs/operators';
 
-import { Navigation, View } from 'src/app/core';
-import { NoiseComponent } from './noise.component';
+import { NoisePlayer, Noise, NoiseType } from 'src/engine';
+import { Navigation, View, Runtime } from 'src/app/core';
 
 @Component({
   selector: 'cm-noise-player',
@@ -10,35 +10,48 @@ import { NoiseComponent } from './noise.component';
   styleUrls: ['./noise-player.component.css']
 })
 export class NoisePlayerComponent {
-  constructor(private navigation: Navigation) { }
+  constructor(
+    private runtime: Runtime,
+    private navigation: Navigation
+  ) { }
 
-  @ViewChildren(NoiseComponent) noiseComponents;
-
-  init: boolean;
-  muted: boolean;
-  noises = [
-    { icon: 'assets/images/sea-waves.svg', title: 'Sea Side', source: 'https://cdn.noisli.com/hls/seaside/seaside.m3u8' },
-    { icon: 'assets/images/forest.svg', title: 'Forest', source: 'https://cdn.noisli.com/hls/forest/forest.m3u8' },
-    { icon: 'assets/images/rain.svg', title: 'Rain', source: 'https://cdn.noisli.com/hls/rain/rain.m3u8' },
-    { icon: 'assets/images/thunder.svg', title: 'Thunder Storm', source: 'https://cdn.noisli.com/hls/thunderstorm/thunderstorm.m3u8' },
-    { icon: 'assets/images/fire.svg', title: 'Fire', source: 'https://cdn.noisli.com/hls/fire/fire.m3u8' },
-    { icon: 'assets/images/night.svg', title: 'Summer Night', source: 'https://cdn.noisli.com/hls/summernight/summernight.m3u8' },
-    { icon: 'assets/images/wind.svg', title: 'Wind', source: 'https://cdn.noisli.com/hls/wind/wind.m3u8' },
-    { icon: 'assets/images/leaves.svg', title: 'Leaves', source: 'https://cdn.noisli.com/hls/leaves/leaves.m3u8' },
-  ];
+  initiated: boolean;
+  noises: UiNoise[];
+  noisePlayer: NoisePlayer;
 
   ngOnInit() {
-    this.navigation.navigate$.pipe(first(e => e == View.noises)).subscribe(() => this.init = true);
+    this.navigation.navigate$.pipe(first(e => e == View.noises)).subscribe(() => {
+      this.noisePlayer = this.runtime.engine.noisePlayer;
+      this.noises = [
+        this.createNoise(NoiseType.seaside, 'Sea side', 'assets/images/sea-waves.svg'),
+        this.createNoise(NoiseType.forest, 'Forest', 'assets/images/forest.svg'),
+        this.createNoise(NoiseType.rain, 'Rain', 'assets/images/rain.svg'),
+        this.createNoise(NoiseType.thunder, 'Thunder storm', 'assets/images/thunder.svg'),
+        this.createNoise(NoiseType.fire, 'Fire', 'assets/images/fire.svg'),
+        this.createNoise(NoiseType.summer, 'Summer night', 'assets/images/night.svg'),
+        this.createNoise(NoiseType.wind, 'Wind', 'assets/images/wind.svg'),
+        this.createNoise(NoiseType.leaves, 'Leaves', 'assets/images/leaves.svg')
+      ];
+      this.initiated = true;
+    });
   }
 
-  toggleMuted() {
-    this.muted = !this.muted;
-    this.noiseComponents.forEach(e => e.setPaused(this.muted));
+  private createNoise(type: NoiseType, title: string, icon: string) {
+    const noise = this.noisePlayer.getNoise(type);
+    return new UiNoise(noise, title, icon);
   }
 
-  noiseSelected() {
-    if (this.muted) {
-      this.toggleMuted();
-    }
-  }
+}
+
+export class UiNoise {
+  constructor(
+    public noise: Noise,
+    public title: string,
+    public icon: string
+  ) { }
+
+  get playing() { return this.noise.playing }
+  get volume() { return this.noise.volume * 100 }
+  set volume(value) { this.noise.volume = value / 100 }
+
 }

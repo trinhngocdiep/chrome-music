@@ -8,7 +8,7 @@ class ProxyPlayer {
       height: '240',
       events: {
         onReady: () => {
-          console.log('YT Player ready');
+          console.debug('YT Player ready');
         },
         onStateChange: () => {
           const playerState = this.player.getPlayerState();
@@ -52,7 +52,7 @@ class ProxyPlayer {
             return;
           }
           const errorCode = event.data;
-          console.log('cannot play video. Error code:', errorCode);
+          console.log('Cannot play video. Error code:', errorCode);
           sendMessage('onError', 'Cannot play YouTube video. Error code: ' + getErrorMessage(errorCode));
         }
       }
@@ -73,10 +73,14 @@ class ProxyPlayer {
   }
 
   resume(track) {
+    if (this.player.getPlayerState() == -1) {
+      sendMessage('onError', 'Cannot resume video: ' + track.title + '. Error: ' + getErrorMessage(errorCode));
+      return;
+    }
     if (this.track && this.track.videoId == track.videoId) {
       this.player.playVideo();
     } else {
-      throw 'Cannot resume video because the current track is different';
+      this.play(track);
     }
   }
 
@@ -135,7 +139,7 @@ function sendMessage(event, data) {
 }
 
 function onYouTubeIframeAPIReady() {
-  console.log('onYouTubeIframeAPIReady');
+  console.debug('onYouTubeIframeAPIReady');
 
   const proxyPlayer = new ProxyPlayer();
   window.addEventListener('message', function (message) {

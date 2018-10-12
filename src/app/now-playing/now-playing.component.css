@@ -10,12 +10,11 @@
 
 .now-playing__playlist {
   display: block;
-  height: 450px;
+  height: var(--content-height);
   overflow: hidden;
   background: white;
   min-width: 300px;
   max-width: 300px;
-  padding-left: 8px;
 }
 
 .player {

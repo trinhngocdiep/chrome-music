@@ -1,10 +1,12 @@
-<div class="container" *ngIf="init">
+<div class="container" *ngIf="initiated">
   <div class="container__controls">
-    <span class="container__controls-hint">Select to mix the noises</span>
-    <mat-icon class="container__controls-mute" (click)="toggleMuted()" *ngIf="!muted">volume_up</mat-icon>
-    <mat-icon class="container__controls-mute" (click)="toggleMuted()" *ngIf="muted">volume_off</mat-icon>
+    <div class="container__controls-hint">Select to mix the effects</div>
+    <mat-icon class="container__controls-mute" [class.container__controls-mute_active]="noisePlayer.muted" (click)="noisePlayer.toggleMuted()">{{noisePlayer.muted ? 'volume_off' : 'volume_up'}}</mat-icon>
   </div>
   <div class="container__noises">
-    <cm-noise *ngFor="let e of noises" [data]="e" (select)="noiseSelected()"></cm-noise>
+    <div class="noise" *ngFor="let e of noises" [class.noise_playing]="e.playing" [title]="e.title" (click)="noisePlayer.toggleNoise(e.noise.type)">
+      <img class="noise__icon" [src]="e.icon">
+      <mat-slider class="noise__volume" min="0" max="100" [value]="e.volume" (click)="$event.stopPropagation()" (change)="e.volume = $event.value"></mat-slider>
+    </div>
   </div>
 </div>
