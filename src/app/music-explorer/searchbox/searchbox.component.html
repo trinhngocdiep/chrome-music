@@ -1,6 +1,6 @@
 <div class="searchbox">
 
-  <mat-form-field class="searchbox__term">
+  <mat-form-field class="searchbox__term" appearance="fill">
     <mat-label>Track title, artist, etc.</mat-label>
     <input #searchInput matInput [(ngModel)]="state.term" [matAutocomplete]="searchAutoComplete" (keydown.enter)="acceptSearchTerm()">
     <mat-autocomplete #searchAutoComplete="matAutocomplete" (optionSelected)="acceptSearchTerm()">

@@ -8,8 +8,9 @@
         <mat-icon class="searchbox__icon">search</mat-icon>
         <input class="searchbox__input" type="search" placeholder="Filter" #searchInput [(ngModel)]="filter">
       </div>
-      <mat-icon class="toolbar__sort" [ngClass]="{'toolbar__sort_desc': sortDirection == 'desc', 'toolbar__sort_asc': sortDirection == 'asc'}"
-        (click)="sort()">sort</mat-icon>
+      <button class="toolbar__menu" mat-icon-button [matMenuTriggerFor]="filterMenu" disableRipple>
+        <mat-icon>more_vert</mat-icon>
+      </button>
     </div>
 
     <div class="tracklist__list" *ngIf="visibleTracks?.length > 0; else filterNoResultTemplate">
@@ -25,6 +26,13 @@
   </div>
 
 </div>
+
+<mat-menu #filterMenu="matMenu">
+  <ng-template matMenuContent>
+    <button mat-menu-item (click)="sort()">
+      <mat-icon>sort_by_alpha</mat-icon>Sort</button>
+  </ng-template>
+</mat-menu>
 
 <mat-menu #trackMenu="matMenu">
   <ng-template matMenuContent let-data>

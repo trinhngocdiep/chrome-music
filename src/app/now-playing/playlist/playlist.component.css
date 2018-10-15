@@ -16,28 +16,13 @@
   right: 8px;
   left: 0;
   background: white;
-  padding: 8px;
+  padding: 8px 12px;
   display: flex;
+  align-items: center;
 }
 
 .toolbar__searchbox {
   flex: 1;
-}
-
-.toolbar__sort {
-  margin-left: 8px;
-  cursor: pointer;
-  transform: rotateX(180deg);
-  opacity: .5;
-}
-
-.toolbar__sort_asc {
-  opacity: 1;
-}
-
-.toolbar__sort_desc {
-  opacity: 1;
-  transform: rotateX(0);
 }
 
 .searchbox {
@@ -47,7 +32,8 @@
 .searchbox__icon {
   position: absolute;
   left: 4px;
-  top: 1px;
+  top: 50%;
+  transform: translateY(-50%);
   opacity: .5;
 }
 
@@ -55,8 +41,15 @@
   width: 100%;
   border: 1px solid lightgrey;
   border-radius: 3px;
-  padding: 4px 8px;
+  padding: 4px 12px;
   padding-left: 30px;
+}
+
+.toolbar__menu {
+  width: auto;
+  height: auto;
+  margin-left: 8px;
+  line-height: 1em;
 }
 
 .track {
@@ -64,9 +57,10 @@
   align-items: center;
   cursor: pointer;
   position: relative;
-  padding: 0 8px;
+  padding: 0 12px;
   height: 44px;
   overflow: hidden;
+  font-size: .8em;
 }
 
 .track:hover {
@@ -93,7 +87,7 @@
   min-width: 4em;
   max-width: 4em;
   text-align: right;
-  font-size: 0.8em;
+  /* font-size: 0.8em; */
 }
 
 .track__menu {
